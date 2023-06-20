@@ -19,6 +19,10 @@ var UI embed.FS
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handleStatic)
+
+	// note: only React itself calls this api endpoint
+	mux.HandleFunc("/show", showTodos)
+
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
