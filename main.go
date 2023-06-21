@@ -2,29 +2,15 @@ package main
 
 import (
 	"embed"
-	"fmt"
-	"io"
 	"io/fs"
 	"log"
-	"mime"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
+
+	"github.com/go-chi/chi/v5"
 )
 
 //go:embed _ui/dist
 var UI embed.FS
-
-func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", handleStatic)
-
-	// note: only React itself calls this api endpoint
-	mux.HandleFunc("/show", showTodos)
-
-	log.Fatal(http.ListenAndServe(":8080", mux))
-}
 
 var uiFS fs.FS
 
@@ -36,40 +22,29 @@ func init() {
 	}
 }
 
-func handleStatic(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
+type Server struct {
+	ListenAddr string
+	Router     *chi.Mux
+}
 
-	path := filepath.Clean(r.URL.Path)
-	if path == "/" { // Add other paths that you route on the UI side here
-		path = "index.html"
-	}
-	path = strings.TrimPrefix(path, "/")
+func NewServer(listenAddr string) *Server {
+	s := &Server{}
+	s.Router = chi.NewRouter()
+	s.ListenAddr = listenAddr
+	return s
+}
 
-	file, err := uiFS.Open(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			log.Println("file", path, "not found:", err)
-			http.NotFound(w, r)
-			return
-		}
-		log.Println("file", path, "cannot be read:", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+func (s *Server) MountHandlers() {
+	// embedded react UI
+	s.Router.Get("/*", handleStatic)
 
-	contentType := mime.TypeByExtension(filepath.Ext(path))
-	w.Header().Set("Content-Type", contentType)
-	if strings.HasPrefix(path, "static/") {
-		w.Header().Set("Cache-Control", "public, max-age=31536000")
-	}
-	stat, err := file.Stat()
-	if err == nil && stat.Size() > 0 {
-		w.Header().Set("Content-Length", fmt.Sprintf("%d", stat.Size()))
-	}
+	// api consumed by _ui
+	s.Router.Get("/show", showTodos)
+	s.Router.Get("/edit", editTodo)
+}
 
-	n, _ := io.Copy(w, file)
-	log.Println("file", path, "copied", n, "bytes")
+func main() {
+	s := NewServer(":8080")
+	s.MountHandlers()
+	log.Fatal(http.ListenAndServe(s.ListenAddr, s.Router))
 }
