@@ -36,11 +36,11 @@ func NewServer(listenAddr string) *Server {
 
 func (s *Server) MountHandlers() {
 	// embedded react UI
-	s.Router.Get("/*", handleStatic)
+	s.Router.Get("/*", staticHandler)
 
 	// api consumed by _ui
-	s.Router.Get("/show", showTodos)
-	s.Router.Get("/edit", editTodo)
+	s.Router.Get("/show", getTodosHandler)
+	s.Router.Get("/edit", editTodoHandler)
 }
 
 func main() {

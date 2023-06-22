@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -13,23 +12,24 @@ import (
 	"strings"
 )
 
-type Todo struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Done    bool   `json:"done"`
-}
+// type Todo struct {
+// 	Id      int    `json:"id"`
+// 	Title   string `json:"title"`
+// 	Content string `json:"content"`
+// 	Done    bool   `json:"done"`
+// }
 
-type TodoList []Todo
+// type TodoList []Todo
 
-const TODOLISTFILEPATH = "./data/dummyData.json"
+// const TODOLISTFILEPATH = "./data/dummyData.json"
 
 // note: THIS IS FOR DEVMODE ONLY
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 }
 
-func handleStatic(w http.ResponseWriter, r *http.Request) {
+// handleStatic handles the whole UI by embeding _ui
+func staticHandler(w http.ResponseWriter, r *http.Request) {
 
 	path := filepath.Clean(r.URL.Path)
 	if path == "/" { // Add other paths that you route on the UI side here
@@ -63,30 +63,22 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 	log.Println("file", path, "copied", n, "bytes")
 }
 
-func showTodos(w http.ResponseWriter, r *http.Request) {
+func getTodosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
 
-	content, err := os.ReadFile(TODOLISTFILEPATH)
+	todos, err := getTodos()
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "error opening *.json", http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	if json.Valid(content) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(content)
-		return
-	} else {
-		log.Println("error invalid JSON")
-		http.Error(w, "invalid json", http.StatusInternalServerError)
-		return
-	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(todos)
 }
 
-func editTodo(w http.ResponseWriter, r *http.Request) {
+func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
@@ -98,38 +90,46 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, err := os.ReadFile(TODOLISTFILEPATH)
+	// content, err := os.ReadFile(TODOLISTFILEPATH)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	http.Error(w, "error opening *.json", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// var todoList TodoList
+	// err = json.Unmarshal(content, &todoList)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	http.Error(w, "error unmarshal *.json", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// for i := 0; i < len(todoList); i++ {
+	// 	if todoList[i].Id == id {
+	// 		todoList[i].Done = !todoList[i].Done
+	// 	}
+	// }
+	// cJSON, err := json.Marshal(todoList)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	http.Error(w, "error marshal *.json", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// os.WriteFile(TODOLISTFILEPATH, cJSON, 0644)
+
+	todo, err := editDoneTodo(id)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "error opening *.json", http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-
-	var todoList TodoList
-	err = json.Unmarshal(content, &todoList)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "error unmarshal *.json", http.StatusInternalServerError)
-		return
-	}
-
-	for i := 0; i < len(todoList); i++ {
-		if todoList[i].Id == id {
-			todoList[i].Done = !todoList[i].Done
-		}
-	}
-	cJSON, err := json.Marshal(todoList)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "error marshal *.json", http.StatusInternalServerError)
-		return
-	}
-
-	os.WriteFile(TODOLISTFILEPATH, cJSON, 0644)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(cJSON)
-	fmt.Println("we did it>>>>")
+	w.Write(todo)
+	// w.WriteHeader(http.StatusAccepted)
+	fmt.Println("we did it>>>>", todo)
 
 }
 
