@@ -40,7 +40,8 @@ func (s *Server) MountHandlers() {
 
 	// api consumed by _ui
 	s.Router.Get("/show", getTodosHandler)
-	s.Router.Get("/edit", editTodoHandler)
+	s.Router.Get("/edit", editTodoDoneHandler)
+	s.Router.Put("/edit", editTodoHandler)
 }
 
 func main() {

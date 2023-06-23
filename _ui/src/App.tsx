@@ -3,7 +3,7 @@ import TodoList from "./components/TodoList";
 
 function App() {
   return (
-    <div className="bg-slate-900 text-zinc-50 font-mono h-[100vh]">
+    <div className="bg-slate-900 text-zinc-50 font-mono min-h-[100vh] p-5">
       <h1 className="text-3xl text-center mb-6">Go React</h1>
       <TodoList />
     </div>

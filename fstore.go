@@ -18,9 +18,14 @@ type TodoList []Todo
 
 const TODOLISTFILEPATH = "./data/dummyData.json"
 
+func loadFileContent() ([]byte, error) {
+	return os.ReadFile(TODOLISTFILEPATH)
+}
+
 // getTodos returns all Todos from from FS in JSON
 func getTodos() ([]byte, error) {
-	content, err := os.ReadFile(TODOLISTFILEPATH)
+
+	content, err := loadFileContent()
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -38,7 +43,7 @@ func getTodos() ([]byte, error) {
 func editDoneTodo(id int) ([]byte, error) {
 	var todo Todo
 
-	content, err := os.ReadFile(TODOLISTFILEPATH)
+	content, err := loadFileContent()
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -75,6 +80,47 @@ func editDoneTodo(id int) ([]byte, error) {
 	return todoJson, nil
 }
 
-// create
 // edit_content
+func editTodo(todo Todo) ([]byte, error) {
+
+	content, err := loadFileContent()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var todoList TodoList
+	err = json.Unmarshal(content, &todoList)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	for i := 0; i < len(todoList); i++ {
+		if todoList[i].Id == todo.Id {
+			todoList[i] = todo
+		}
+	}
+
+	todosJson, err := json.Marshal(todoList)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+
+	todoJson, err := json.Marshal(todo)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	log.Println(string(todoJson))
+	return todoJson, nil
+
+}
+
+// create
+
 // delete

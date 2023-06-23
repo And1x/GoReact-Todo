@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -78,7 +79,7 @@ func getTodosHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(todos)
 }
 
-func editTodoHandler(w http.ResponseWriter, r *http.Request) {
+func editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
@@ -89,35 +90,6 @@ func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid url", http.StatusBadRequest)
 		return
 	}
-
-	// content, err := os.ReadFile(TODOLISTFILEPATH)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	http.Error(w, "error opening *.json", http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// var todoList TodoList
-	// err = json.Unmarshal(content, &todoList)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	http.Error(w, "error unmarshal *.json", http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// for i := 0; i < len(todoList); i++ {
-	// 	if todoList[i].Id == id {
-	// 		todoList[i].Done = !todoList[i].Done
-	// 	}
-	// }
-	// cJSON, err := json.Marshal(todoList)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	http.Error(w, "error marshal *.json", http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// os.WriteFile(TODOLISTFILEPATH, cJSON, 0644)
 
 	todo, err := editDoneTodo(id)
 	if err != nil {
@@ -130,6 +102,33 @@ func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(todo)
 	// w.WriteHeader(http.StatusAccepted)
 	fmt.Println("we did it>>>>", todo)
+}
+
+func editTodoHandler(w http.ResponseWriter, r *http.Request) {
+
+	// note: this enables CORS for DEVMODE
+	enableCors(&w)
+
+	// decode request.body todo
+	decodeReq := json.NewDecoder(r.Body)
+	var todo Todo
+	err := decodeReq.Decode(&todo)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	storedTodo, err := editTodo(todo)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(storedTodo)
+	// w.WriteHeader(http.StatusAccepted)
+	fmt.Println("woooohoo it worked:)", storedTodo)
 
 }
 
