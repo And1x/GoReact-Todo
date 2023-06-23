@@ -5,7 +5,13 @@ import { ReactComponent as EditBtn } from "../assets/edit.svg";
 import { ReactComponent as CloseBtn } from "../assets/close.svg";
 import { useState, useRef } from "react";
 
-export default function TodoItem({ item }: { item: Todo }) {
+interface Probs {
+  item: Todo;
+  updateList: () => void;
+}
+
+export default function TodoItem({ item, updateList }: Probs) {
+  // export default function TodoItem({ item }: { item: Todo }) {
   const [expand, setExpand] = useState<boolean>(false);
   const [itemU, setItemU] = useState(item);
   const [editMode, setEditMode] = useState(false);
@@ -60,6 +66,23 @@ export default function TodoItem({ item }: { item: Todo }) {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/todo?id=${item.id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error(`Error! status: ${response.status}`);
+      } else {
+        alert("deleted");
+        updateList();
+      }
+    } catch (err) {
+      // note: handle this err
+      console.log(err);
+    }
+  };
+
   return (
     <div
       className={`relative shadow-md w-[50vw] border border-emerald-400 bg-slate-950 rounded p-3`}
@@ -96,7 +119,10 @@ export default function TodoItem({ item }: { item: Todo }) {
               className="w-5 h-5 fill-emerald-50 cursor-pointer rounded hover:bg-slate-700"
               onClick={() => setEditMode(true)}
             />
-            <DeleteBtn className="w-5 h-5 fill-red-700 cursor-pointer rounded hover:bg-slate-700" />
+            <DeleteBtn
+              className="w-5 h-5 fill-red-700 cursor-pointer rounded hover:bg-slate-700"
+              onClick={() => handleDelete()}
+            />
           </div>
         </>
       ) : (

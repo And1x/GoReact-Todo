@@ -42,6 +42,9 @@ func (s *Server) MountHandlers() {
 	s.Router.Get("/show", getTodosHandler)
 	s.Router.Get("/edit", editTodoDoneHandler)
 	s.Router.Put("/edit", editTodoHandler)
+	// s.Router.Delete("/todo?id={id}", deleteTodoHandler)
+	s.Router.Delete("/todo", deleteTodoHandler)
+	s.Router.Post("/new", newTodoHandler)
 }
 
 func main() {

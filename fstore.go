@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 type Todo struct {
@@ -69,7 +70,10 @@ func editDoneTodo(id int) ([]byte, error) {
 		return nil, err
 	}
 
-	os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	if err != nil {
+		return nil, err
+	}
 
 	todoJson, err := json.Marshal(todo)
 	if err != nil {
@@ -108,7 +112,10 @@ func editTodo(todo Todo) ([]byte, error) {
 		return nil, err
 	}
 
-	os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	if err != nil {
+		return nil, err
+	}
 
 	todoJson, err := json.Marshal(todo)
 	if err != nil {
@@ -116,11 +123,79 @@ func editTodo(todo Todo) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println(string(todoJson))
+	// log.Println(string(todoJson))
 	return todoJson, nil
 
 }
 
-// create
-
 // delete
+func deleteTodo(id int) error {
+
+	content, err := loadFileContent()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	var todoList TodoList
+	err = json.Unmarshal(content, &todoList)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	for i := 0; i < len(todoList); i++ {
+		if todoList[i].Id == id {
+			// remove the item from the []todolist
+			todoList = append(todoList[:i], todoList[i+1:]...)
+		}
+	}
+
+	todosJson, err := json.Marshal(todoList)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// create
+func newTodo(todo Todo) ([]byte, error) {
+
+	content, err := loadFileContent()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var todoList TodoList
+	err = json.Unmarshal(content, &todoList)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	id := time.Now()
+	id.Unix()
+	todo.Id = int(id.Unix())
+	todoList = append(todoList, todo)
+
+	todosJson, err := json.Marshal(todoList)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return todosJson, nil
+}

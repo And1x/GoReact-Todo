@@ -26,7 +26,15 @@ export default function TodoList() {
       <div>
         <ul className="flex flex-col gap-4 items-center justify-center">
           {todoList.map((todo) => (
-            <TodoItem key={todo.id} item={todo} />
+            <TodoItem
+              key={todo.id}
+              item={todo}
+              updateList={() => {
+                getTodoList().then((todos) => {
+                  setTodoList(todos);
+                });
+              }}
+            />
           ))}
         </ul>
       </div>

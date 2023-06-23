@@ -13,17 +13,6 @@ import (
 	"strings"
 )
 
-// type Todo struct {
-// 	Id      int    `json:"id"`
-// 	Title   string `json:"title"`
-// 	Content string `json:"content"`
-// 	Done    bool   `json:"done"`
-// }
-
-// type TodoList []Todo
-
-// const TODOLISTFILEPATH = "./data/dummyData.json"
-
 // note: THIS IS FOR DEVMODE ONLY
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
@@ -127,15 +116,43 @@ func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(storedTodo)
-	// w.WriteHeader(http.StatusAccepted)
-	fmt.Println("woooohoo it worked:)", storedTodo)
-
 }
 
-func newTodo(w http.ResponseWriter, r *http.Request) {
+func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	err = deleteTodo(id)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }
 
-func deleteTodo(w http.ResponseWriter, r *http.Request) {
+func newTodoHandler(w http.ResponseWriter, r *http.Request) {
 
+	// decode request.body todo
+	decodeReq := json.NewDecoder(r.Body)
+	var todo Todo
+	err := decodeReq.Decode(&todo)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	todoList, err := newTodo(todo)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(todoList)
 }
