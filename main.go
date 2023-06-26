@@ -15,7 +15,16 @@ var UI embed.FS
 
 var uiFS fs.FS
 
-const PORT = ":8080"
+type Server struct {
+	ListenAddr string
+	Router     *chi.Mux
+}
+
+const PORT = ":7900"
+const DATADIR = "data"
+const DATAFILE = "todoData.json"
+
+var TODOLISTFILEPATH = fmt.Sprintf("./%v/%v", DATADIR, DATAFILE)
 
 func init() {
 	var err error
@@ -23,11 +32,6 @@ func init() {
 	if err != nil {
 		log.Fatal("failed to get ui fs", err)
 	}
-}
-
-type Server struct {
-	ListenAddr string
-	Router     *chi.Mux
 }
 
 func NewServer(listenAddr string) *Server {
@@ -45,7 +49,6 @@ func (s *Server) MountHandlers() {
 	s.Router.Get("/show", getTodosHandler)
 	s.Router.Get("/edit", editTodoDoneHandler)
 	s.Router.Put("/edit", editTodoHandler)
-	// s.Router.Delete("/todo?id={id}", deleteTodoHandler)
 	s.Router.Delete("/todo", deleteTodoHandler)
 	s.Router.Post("/new", newTodoHandler)
 }

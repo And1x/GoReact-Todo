@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -17,10 +18,24 @@ type Todo struct {
 
 type TodoList []Todo
 
-const TODOLISTFILEPATH = "./data/dummyData.json"
-
 func loadFileContent() ([]byte, error) {
-	return os.ReadFile(TODOLISTFILEPATH)
+
+	fc, err := os.ReadFile(TODOLISTFILEPATH)
+	// create folder and file in case it not exists
+	if errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(fmt.Sprintf("./%s", DATADIR), os.ModePerm)
+		if err != nil && !errors.Is(err, os.ErrExist) {
+			return nil, err
+		}
+		// _, err = os.Create(TODOLISTFILEPATH)
+		err = os.WriteFile(TODOLISTFILEPATH, []byte("[]"), 0644)
+		if err != nil {
+			return nil, err
+		}
+	} else if err != nil {
+		return nil, err
+	}
+	return fc, nil
 }
 
 // getTodos returns all Todos from from FS in JSON
