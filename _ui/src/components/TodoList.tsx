@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import TodoItem from "./Todo";
 
 const getTodoList = async () => {
-  return fetch("http://localhost:8080/show").then((data) => data.json());
+  return fetch("http://localhost:7900/show").then((data) => data.json());
 };
 
 export interface Todo {

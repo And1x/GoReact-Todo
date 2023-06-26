@@ -10,7 +10,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:8080/new`, {
+      const response = await fetch(`http://localhost:7900/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
