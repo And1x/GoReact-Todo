@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 var UI embed.FS
 
 var uiFS fs.FS
+
+const PORT = ":8080"
 
 func init() {
 	var err error
@@ -48,7 +51,8 @@ func (s *Server) MountHandlers() {
 }
 
 func main() {
-	s := NewServer(":8080")
+	s := NewServer(PORT)
 	s.MountHandlers()
+	fmt.Printf("Visit: http://localhost%v\n", PORT)
 	log.Fatal(http.ListenAndServe(s.ListenAddr, s.Router))
 }
