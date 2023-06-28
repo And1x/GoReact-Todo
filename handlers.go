@@ -8,7 +8,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
-	"path/filepath"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -21,27 +21,28 @@ func enableCors(w *http.ResponseWriter) {
 // handleStatic handles the whole UI by embeding _ui
 func staticHandler(w http.ResponseWriter, r *http.Request) {
 
-	path := filepath.Clean(r.URL.Path)
-	if path == "/" { // Add other paths that you route on the UI side here
-		path = "index.html"
+	p := path.Clean(r.URL.Path)
+	if p == "/" { // Add other paths that you route on the UI side here
+		p = "index.html"
 	}
-	path = strings.TrimPrefix(path, "/")
 
-	file, err := uiFS.Open(path)
+	p = strings.TrimPrefix(p, "/")
+
+	file, err := uiFS.Open(p)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Println("file", path, "not found:", err)
+			log.Println("file", p, "not found:", err)
 			http.NotFound(w, r)
 			return
 		}
-		log.Println("file", path, "cannot be read:", err)
+		log.Println("file", p, "cannot be read:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	contentType := mime.TypeByExtension(filepath.Ext(path))
+	contentType := mime.TypeByExtension(path.Ext(p))
 	w.Header().Set("Content-Type", contentType)
-	if strings.HasPrefix(path, "static/") {
+	if strings.HasPrefix(p, "static/") {
 		w.Header().Set("Cache-Control", "public, max-age=31536000")
 	}
 	stat, err := file.Stat()
@@ -50,7 +51,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	n, _ := io.Copy(w, file)
-	log.Println("file", path, "copied", n, "bytes")
+	log.Println("file", p, "copied", n, "bytes")
 }
 
 func getTodosHandler(w http.ResponseWriter, r *http.Request) {
@@ -89,8 +90,6 @@ func editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(todo)
-	// w.WriteHeader(http.StatusAccepted)
-	fmt.Println("we did it>>>>", todo)
 }
 
 func editTodoHandler(w http.ResponseWriter, r *http.Request) {

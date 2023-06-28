@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"path"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -24,11 +25,11 @@ const PORT = ":7900"
 const DATADIR = "data"
 const DATAFILE = "todoData.json"
 
-var TODOLISTFILEPATH = fmt.Sprintf("./%v/%v", DATADIR, DATAFILE)
+var TODOLISTFILEPATH = path.Join(DATADIR, DATAFILE)
 
 func init() {
 	var err error
-	uiFS, err = fs.Sub(UI, "_ui/dist")
+	uiFS, err = fs.Sub(UI, path.Join("_ui", "dist"))
 	if err != nil {
 		log.Fatal("failed to get ui fs", err)
 	}
