@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
+	"path"
 	"time"
 )
 
@@ -16,59 +16,77 @@ type Todo struct {
 	Done    bool   `json:"done"`
 }
 
-type TodoList []Todo
+type TodosFileStorage struct {
+	dirName  string
+	fileName string
+	dataType string
+}
 
-func loadFileContent() ([]byte, error) {
+func (tfs *TodosFileStorage) getFilePath() string {
+	return path.Join(tfs.dirName, tfs.fileName+tfs.dataType)
+}
 
-	fc, err := os.ReadFile(TODOLISTFILEPATH)
+// helper method
+func (tfs *TodosFileStorage) loadFile() ([]Todo, error) {
+
+	fc, err := os.ReadFile(tfs.getFilePath())
 	// create folder and file in case it not exists
 	if errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(fmt.Sprintf("./%s", DATADIR), os.ModePerm)
+		err := os.Mkdir(fmt.Sprintf("./%s", tfs.dirName), os.ModePerm)
 		if err != nil && !errors.Is(err, os.ErrExist) {
 			return nil, err
 		}
-		// _, err = os.Create(TODOLISTFILEPATH)
-		err = os.WriteFile(TODOLISTFILEPATH, []byte("[]"), 0644)
+		err = os.WriteFile(tfs.getFilePath(), []byte("[]"), 0644)
 		if err != nil {
 			return nil, err
 		}
 	} else if err != nil {
 		return nil, err
 	}
-	return fc, nil
+
+	var tl []Todo
+	err = json.Unmarshal(fc, &tl)
+	if err != nil {
+		return nil, err
+	}
+	return tl, nil
+}
+
+// helper method
+func (tfs *TodosFileStorage) writeFile(tl []Todo) error {
+
+	tlj, err := json.Marshal(tl)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(tfs.getFilePath(), tlj, 0644); err != nil {
+		return err
+	}
+	return nil
 }
 
 // getTodos returns all Todos from from FS in JSON
-func getTodos() ([]byte, error) {
+func (tfs *TodosFileStorage) GetAll() ([]byte, error) {
 
-	content, err := loadFileContent()
+	todoList, err := tfs.loadFile()
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
-	if !json.Valid(content) {
-		log.Println(err)
-		return nil, fmt.Errorf("received invalid JSON from File")
+	todoListJson, err := json.Marshal(todoList)
+	if err != nil {
+		return nil, err
 	}
-	return content, nil
+	return todoListJson, nil
 }
 
-// edit_done
 // editDoneTodo edit the state of the todo in file and returns the edited todo
-func editDoneTodo(id int) ([]byte, error) {
+func (tfs *TodosFileStorage) EditState(id int) ([]byte, error) {
 	var todo Todo
 
-	content, err := loadFileContent()
+	todoList, err := tfs.loadFile()
 	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	var todoList TodoList
-	err = json.Unmarshal(content, &todoList)
-	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -79,39 +97,18 @@ func editDoneTodo(id int) ([]byte, error) {
 		}
 	}
 
-	todosJson, err := json.Marshal(todoList)
-	if err != nil {
-		log.Println(err)
+	if err := tfs.writeFile(todoList); err != nil {
 		return nil, err
 	}
 
-	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	todoJson, err := json.Marshal(todo)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return todoJson, nil
+	return json.Marshal(todo)
 }
 
 // edit_content
-func editTodo(todo Todo) ([]byte, error) {
+func (tfs *TodosFileStorage) Edit(todo Todo) ([]byte, error) {
 
-	content, err := loadFileContent()
+	todoList, err := tfs.loadFile()
 	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	var todoList TodoList
-	err = json.Unmarshal(content, &todoList)
-	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -121,41 +118,18 @@ func editTodo(todo Todo) ([]byte, error) {
 		}
 	}
 
-	todosJson, err := json.Marshal(todoList)
-	if err != nil {
-		log.Println(err)
+	if err := tfs.writeFile(todoList); err != nil {
 		return nil, err
 	}
 
-	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	todoJson, err := json.Marshal(todo)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	// log.Println(string(todoJson))
-	return todoJson, nil
-
+	return json.Marshal(todo)
 }
 
 // delete
-func deleteTodo(id int) error {
+func (tfs *TodosFileStorage) Delete(id int) error {
 
-	content, err := loadFileContent()
+	todoList, err := tfs.loadFile()
 	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	var todoList TodoList
-	err = json.Unmarshal(content, &todoList)
-	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -166,14 +140,7 @@ func deleteTodo(id int) error {
 		}
 	}
 
-	todosJson, err := json.Marshal(todoList)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
-	if err != nil {
+	if err := tfs.writeFile(todoList); err != nil {
 		return err
 	}
 
@@ -181,18 +148,10 @@ func deleteTodo(id int) error {
 }
 
 // create
-func newTodo(todo Todo) ([]byte, error) {
+func (tfs *TodosFileStorage) New(todo Todo) ([]byte, error) {
 
-	content, err := loadFileContent()
+	todoList, err := tfs.loadFile()
 	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	var todoList TodoList
-	err = json.Unmarshal(content, &todoList)
-	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -201,16 +160,9 @@ func newTodo(todo Todo) ([]byte, error) {
 	todo.Id = int(id.Unix())
 	todoList = append(todoList, todo)
 
-	todosJson, err := json.Marshal(todoList)
-	if err != nil {
-		log.Println(err)
+	if err := tfs.writeFile(todoList); err != nil {
 		return nil, err
 	}
 
-	err = os.WriteFile(TODOLISTFILEPATH, todosJson, 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	return todosJson, nil
+	return json.Marshal(todoList)
 }

@@ -19,7 +19,7 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 // handleStatic handles the whole UI by embeding _ui
-func staticHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) staticHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := path.Clean(r.URL.Path)
 	if p == "/" { // Add other paths that you route on the UI side here
@@ -54,12 +54,12 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("file", p, "copied", n, "bytes")
 }
 
-func getTodosHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) getTodosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
 
-	todos, err := getTodos()
+	todos, err := app.todos.GetAll()
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
@@ -69,7 +69,7 @@ func getTodosHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(todos)
 }
 
-func editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
@@ -81,7 +81,7 @@ func editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todo, err := editDoneTodo(id)
+	todo, err := app.todos.EditState(id)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -92,7 +92,7 @@ func editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(todo)
 }
 
-func editTodoHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) editTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
@@ -106,7 +106,7 @@ func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	storedTodo, err := editTodo(todo)
+	storedTodo, err := app.todos.Edit(todo)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -117,7 +117,7 @@ func editTodoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(storedTodo)
 }
 
-func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
@@ -125,7 +125,7 @@ func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = deleteTodo(id)
+	err = app.todos.Delete(id)
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
@@ -134,7 +134,7 @@ func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func newTodoHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// decode request.body todo
 	decodeReq := json.NewDecoder(r.Body)
@@ -145,7 +145,7 @@ func newTodoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todoList, err := newTodo(todo)
+	todoList, err := app.todos.New(todo)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
