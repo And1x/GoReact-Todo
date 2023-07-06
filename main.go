@@ -59,7 +59,7 @@ func main() {
 	flag.Parse()
 
 	app := &app{
-		todos: &TodosFileStorage{dirName: *dirName, fileName: *fName, dataType: ".json"},
+		todos: &TodosFileStorage{dirName: *dirName, fileName: *fName, fileType: ".json"},
 	}
 	s := &http.Server{
 		Addr:    port,

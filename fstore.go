@@ -9,67 +9,59 @@ import (
 	"time"
 )
 
-type Todo struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Done    bool   `json:"done"`
-}
-
 type TodosFileStorage struct {
 	dirName  string
 	fileName string
-	dataType string
+	fileType string
 }
 
-func (tfs *TodosFileStorage) getFilePath() string {
-	return path.Join(tfs.dirName, tfs.fileName+tfs.dataType)
+func (t *TodosFileStorage) getFilePath() string {
+	return path.Join(t.dirName, t.fileName+t.fileType)
 }
 
-// helper method
-func (tfs *TodosFileStorage) loadFile() ([]Todo, error) {
+// loadFile loads TodoList file - creates data folder and file if it not exists
+func (t *TodosFileStorage) loadFile() (*os.File, error) {
 
-	fc, err := os.ReadFile(tfs.getFilePath())
-	// create folder and file in case it not exists
+	f, err := os.Open(t.getFilePath())
 	if errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(fmt.Sprintf("./%s", tfs.dirName), os.ModePerm)
+		err := os.Mkdir(t.dirName, os.ModePerm)
 		if err != nil && !errors.Is(err, os.ErrExist) {
 			return nil, err
 		}
-		err = os.WriteFile(tfs.getFilePath(), []byte("[]"), 0644)
+		err = os.WriteFile(t.getFilePath(), []byte("[]"), 0644)
 		if err != nil {
 			return nil, err
 		}
 	} else if err != nil {
 		return nil, err
 	}
-
-	var tl []Todo
-	err = json.Unmarshal(fc, &tl)
-	if err != nil {
-		return nil, err
-	}
-	return tl, nil
+	return f, nil
 }
 
-// helper method
-func (tfs *TodosFileStorage) writeFile(tl []Todo) error {
+func (t *TodosFileStorage) writeFile(tl []Todo) error {
 
 	tlj, err := json.Marshal(tl)
 	if err != nil {
 		return err
 	}
 
-	if err := os.WriteFile(tfs.getFilePath(), tlj, 0644); err != nil {
+	if err := os.WriteFile(t.getFilePath(), tlj, 0644); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // getTodos returns all Todos from from FS in JSON
-func (tfs *TodosFileStorage) GetAll() ([]byte, error) {
+func (t *TodosFileStorage) GetAll() ([]byte, error) {
 
-	todoList, err := tfs.loadFile()
+	f, err := t.loadFile()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	todoList, err := getTodoList(f)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +74,16 @@ func (tfs *TodosFileStorage) GetAll() ([]byte, error) {
 }
 
 // editDoneTodo edit the state of the todo in file and returns the edited todo
-func (tfs *TodosFileStorage) EditState(id int) ([]byte, error) {
+func (t *TodosFileStorage) EditState(id int) ([]byte, error) {
 	var todo Todo
 
-	todoList, err := tfs.loadFile()
+	f, err := t.loadFile()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	todoList, err := getTodoList(f)
 	if err != nil {
 		return nil, err
 	}
@@ -97,17 +95,23 @@ func (tfs *TodosFileStorage) EditState(id int) ([]byte, error) {
 		}
 	}
 
-	if err := tfs.writeFile(todoList); err != nil {
+	if err := t.writeFile(todoList); err != nil {
 		return nil, err
 	}
-
+	fmt.Println("what??", todoList)
 	return json.Marshal(todo)
 }
 
 // edit_content
-func (tfs *TodosFileStorage) Edit(todo Todo) ([]byte, error) {
+func (t *TodosFileStorage) Edit(todo Todo) ([]byte, error) {
 
-	todoList, err := tfs.loadFile()
+	f, err := t.loadFile()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	todoList, err := getTodoList(f)
 	if err != nil {
 		return nil, err
 	}
@@ -118,17 +122,22 @@ func (tfs *TodosFileStorage) Edit(todo Todo) ([]byte, error) {
 		}
 	}
 
-	if err := tfs.writeFile(todoList); err != nil {
+	if err := t.writeFile(todoList); err != nil {
 		return nil, err
 	}
-
 	return json.Marshal(todo)
 }
 
 // delete
-func (tfs *TodosFileStorage) Delete(id int) error {
+func (t *TodosFileStorage) Delete(id int) error {
 
-	todoList, err := tfs.loadFile()
+	f, err := t.loadFile()
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	todoList, err := getTodoList(f)
 	if err != nil {
 		return err
 	}
@@ -140,17 +149,22 @@ func (tfs *TodosFileStorage) Delete(id int) error {
 		}
 	}
 
-	if err := tfs.writeFile(todoList); err != nil {
+	if err := t.writeFile(todoList); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 // create
-func (tfs *TodosFileStorage) New(todo Todo) ([]byte, error) {
+func (t *TodosFileStorage) New(todo Todo) ([]byte, error) {
 
-	todoList, err := tfs.loadFile()
+	f, err := t.loadFile()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	todoList, err := getTodoList(f)
 	if err != nil {
 		return nil, err
 	}
@@ -160,9 +174,8 @@ func (tfs *TodosFileStorage) New(todo Todo) ([]byte, error) {
 	todo.Id = int(id.Unix())
 	todoList = append(todoList, todo)
 
-	if err := tfs.writeFile(todoList); err != nil {
+	if err := t.writeFile(todoList); err != nil {
 		return nil, err
 	}
-
 	return json.Marshal(todoList)
 }
