@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"path"
 	"time"
@@ -98,7 +97,7 @@ func (t *TodosFileStorage) EditState(id int) ([]byte, error) {
 	if err := t.writeFile(todoList); err != nil {
 		return nil, err
 	}
-	fmt.Println("what??", todoList)
+
 	return json.Marshal(todo)
 }
 
