@@ -100,7 +100,11 @@ export default function TodoItem({ item, updateList }: Probs) {
               </span>
               {itemU.title}
             </h4>
-            {expand ? <p className={`text-white`}>{itemU.content}</p> : null}
+            {expand ? (
+              <pre>
+                <p className={`text-white`}>{itemU.content}</p>
+              </pre>
+            ) : null}
           </div>
 
           {itemU.done ? (
