@@ -22,7 +22,7 @@ export default function TodoItem({ item, updateList }: Probs) {
   // send get Request to change Done-state
   const handleClickDone = async () => {
     try {
-      const response = await fetch(`http://localhost:7900/edit?id=${item.id}`, {
+      const response = await fetch(`${SERVER}/edit?id=${item.id}`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -44,7 +44,7 @@ export default function TodoItem({ item, updateList }: Probs) {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:7900/edit`, {
+      const response = await fetch(`${SERVER}/edit`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
