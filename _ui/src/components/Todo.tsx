@@ -4,6 +4,7 @@ import { ReactComponent as DeleteBtn } from "../assets/delete.svg";
 import { ReactComponent as EditBtn } from "../assets/edit.svg";
 import { ReactComponent as CloseBtn } from "../assets/close.svg";
 import { useState, useRef } from "react";
+import { SERVER } from "../globals";
 
 interface Probs {
   item: Todo;
@@ -68,7 +69,7 @@ export default function TodoItem({ item, updateList }: Probs) {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:7900/todo?id=${item.id}`, {
+      const response = await fetch(`${SERVER}/todo?id=${item.id}`, {
         method: "DELETE",
       });
       if (!response.ok) {

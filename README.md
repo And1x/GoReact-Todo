@@ -23,5 +23,5 @@
 ### How to run:
 
 - Execute the binary using the CLI or GUI
-- Visit http://localhost:7900
+- Visit http://localhost:7900 -> HOST can be changed in _\_ui/.env_
 - Todo items are stored in _./data/todoData.json_

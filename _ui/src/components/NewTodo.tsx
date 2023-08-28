@@ -1,5 +1,6 @@
 import { ReactComponent as CloseBtn } from "../assets/close.svg";
 import { useRef } from "react";
+import { SERVER } from "../globals";
 
 export default function NewTodo({ disableNew }: { disableNew: () => void }) {
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -10,7 +11,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:7900/new`, {
+      const response = await fetch(`${SERVER}/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

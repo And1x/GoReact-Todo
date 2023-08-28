@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import TodoItem from "./Todo";
+import { SERVER } from "../globals";
 
 const getTodoList = async () => {
-  return fetch("http://localhost:7900/show").then((data) => data.json());
+  return fetch(`${SERVER}/show`).then((data) => data.json());
 };
 
 export interface Todo {

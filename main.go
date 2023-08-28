@@ -7,9 +7,11 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"path"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
 )
 
 //go:embed _ui/dist
@@ -33,6 +35,11 @@ func init() {
 	if err != nil {
 		log.Fatal("failed to get ui fs", err)
 	}
+
+	// load .env variables
+	if err := godotenv.Load("_ui/.env"); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 }
 
 func (app *app) routes() http.Handler {
@@ -51,9 +58,8 @@ func (app *app) routes() http.Handler {
 }
 
 func main() {
-	// todo: use flage to change port
-	// port := flag.String("port", ":7900", "HTTP network port")
-	port := ":7900"
+
+	port := os.Getenv("VITE_SERVER_PORT")
 	dirName := flag.String("dir", "data", "Directory of stored Todos")
 	fName := flag.String("f", "todoData", "File Name of stored Todos")
 	flag.Parse()
@@ -66,6 +72,6 @@ func main() {
 		Handler: app.routes(),
 	}
 
-	fmt.Printf("Visit: http://localhost%v\n", port)
+	fmt.Printf("Visit: %v%v\n", os.Getenv("VITE_SERVER_ADDR"), port)
 	log.Fatal(s.ListenAndServe())
 }
