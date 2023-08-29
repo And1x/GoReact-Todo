@@ -90,13 +90,12 @@ export default function TodoItem({ item, updateList }: Probs) {
     >
       {!editMode ? (
         <>
-          <div className="ml-9">
+          <div className="ml-10">
             <h4 className="truncate font-semibold text-lg text-orange-400 pr-14">
               <span
-                className="text-white  mr-1 cursor-pointer"
+                className="text-white  mr-2 cursor-pointer"
                 onClick={() => setExpand(!expand)}
               >
-                {" "}
                 {expand ? "▼" : "►"}
               </span>
               {itemU.title}
@@ -110,12 +109,12 @@ export default function TodoItem({ item, updateList }: Probs) {
 
           {itemU.done ? (
             <Checkmark
-              className="absolute left-3 top-4 w-6 h-6 fill-emerald-600 cursor-pointer"
+              className="absolute left-3 top-3 w-7 h-7 fill-emerald-600 cursor-pointer"
               onClick={handleClickDone}
             />
           ) : (
             <div
-              className="absolute left-3 top-4 w-6 h-6 rounded-full bg-gray-300 cursor-pointer"
+              className="absolute left-3 top-3 w-7 h-7 rounded-full bg-gray-300 cursor-pointer"
               onClick={handleClickDone}
             ></div>
           )}

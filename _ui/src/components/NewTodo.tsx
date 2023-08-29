@@ -42,7 +42,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
           <label htmlFor="new__title">Title:</label>
           <input
             ref={titleInputRef}
-            className="w-full text-black mb-2"
+            className="w-full text-black mb-2 p-1"
             type="text"
             name="new__title"
             id="new__title"
@@ -50,7 +50,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
           <label htmlFor="new__content">Content:</label>
           <textarea
             ref={contentInputRef}
-            className="w-full text-black"
+            className="w-full text-black p-1"
             rows={5}
             name="new__content"
             id="new__content"
