@@ -10,6 +10,7 @@ type Todo struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	Done    bool   `json:"done"`
+	Due     string `json:"due"`
 }
 
 // getTodoList returns a TodoList from whatever has io.Reader interface eg. file, DB or HTTP Respond

@@ -11,6 +11,7 @@ export interface Todo {
   title: string;
   content: string;
   done: boolean;
+  due: Date;
 }
 
 export default function TodoList() {

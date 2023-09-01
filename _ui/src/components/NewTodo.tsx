@@ -1,10 +1,13 @@
 import { ReactComponent as CloseBtn } from "../assets/close.svg";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { SERVER } from "../globals";
 
 export default function NewTodo({ disableNew }: { disableNew: () => void }) {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const contentInputRef = useRef<HTMLTextAreaElement>(null);
+  const [startDate, setStartDate] = useState(
+    new Date().toLocaleDateString("fr-CA")
+  );
 
   // edit whole todo:
   const handleSubmitNew = async (e: React.SyntheticEvent) => {
@@ -18,6 +21,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
           title: titleInputRef.current?.value,
           content: contentInputRef.current?.value,
           done: false,
+          due: startDate,
         }),
       });
       if (!response.ok) {
@@ -37,8 +41,8 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
     <div
       className={`relative shadow-md w-[50vw] border border-emerald-400 bg-slate-950 rounded p-3`}
     >
-      <div className="flex flex-col gap-1 ">
-        <form onSubmit={handleSubmitNew}>
+      <div>
+        <form onSubmit={handleSubmitNew} className="flex flex-col gap-1">
           <label htmlFor="new__title">Title:</label>
           <input
             ref={titleInputRef}
@@ -55,6 +59,17 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
             name="new__content"
             id="new__content"
           ></textarea>
+          <label htmlFor="new__due">Due:</label>
+          <input
+            type="date"
+            className="text-black"
+            name="new__due"
+            id="new__due"
+            value={startDate}
+            onChange={(e) =>
+              setStartDate(new Date(e.target.value).toLocaleDateString("fr-CA"))
+            }
+          />
           <button
             className="bg-slate-700 hover:text-emerald-400 w-fit rounded p-1 mt-2 self-end"
             type="submit"

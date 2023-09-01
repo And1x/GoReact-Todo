@@ -12,12 +12,24 @@ interface Probs {
 }
 
 export default function TodoItem({ item, updateList }: Probs) {
-  // export default function TodoItem({ item }: { item: Todo }) {
   const [expand, setExpand] = useState<boolean>(false);
   const [itemU, setItemU] = useState(item);
   const [editMode, setEditMode] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const contentInputRef = useRef<HTMLTextAreaElement>(null);
+  const [startDate, setStartDate] = useState(
+    new Date(itemU.due).toLocaleDateString("fr-CA") // fr-CA local needed because HTML <input type=date> expects format 'yyyy-MM-dd'
+  );
+
+  const dateNow = new Date();
+  const dateItem = new Date(itemU.due);
+  const dueColor = itemU.done
+    ? "text-white"
+    : dateNow.toDateString() === dateItem.toDateString() // just compare Y/M/D without time (h/m/s...)
+    ? "text-green-600"
+    : dateNow > dateItem
+    ? "text-red-600"
+    : "text-green-600";
 
   // send get Request to change Done-state
   const handleClickDone = async () => {
@@ -52,15 +64,16 @@ export default function TodoItem({ item, updateList }: Probs) {
           title: titleInputRef.current?.value,
           content: contentInputRef.current?.value,
           done: itemU.done,
+          due: startDate,
         }),
       });
       if (!response.ok) {
         throw new Error(`Error! status: ${response.status}`);
       }
       const result = await response.json();
-      // console.log(result);
-      setEditMode(false);
+      // setEditMode(false);
       setItemU(result);
+      setEditMode(false);
     } catch (err) {
       // note: handle this err
       console.log(err);
@@ -101,9 +114,18 @@ export default function TodoItem({ item, updateList }: Probs) {
               {itemU.title}
             </h4>
             {expand ? (
-              <pre>
-                <p className={`text-white`}>{itemU.content}</p>
-              </pre>
+              <>
+                <pre>
+                  <p className={`text-white`}>{itemU.content}</p>
+                </pre>
+
+                <div className="text-sm border-t border-white mt-2 text-right pt-1">
+                  Due:
+                  <span className={dueColor}>
+                    {" " + new Date(itemU.due).toLocaleDateString()}
+                  </span>
+                </div>
+              </>
             ) : null}
           </div>
 
@@ -118,6 +140,7 @@ export default function TodoItem({ item, updateList }: Probs) {
               onClick={handleClickDone}
             ></div>
           )}
+
           <div className="absolute right-1 top-1 flex gap-1">
             <EditBtn
               className="w-5 h-5 fill-emerald-50 cursor-pointer rounded hover:bg-slate-700"
@@ -130,8 +153,8 @@ export default function TodoItem({ item, updateList }: Probs) {
           </div>
         </>
       ) : (
-        <div className="flex flex-col gap-1 ">
-          <form onSubmit={handleSubmitEdit}>
+        <div>
+          <form onSubmit={handleSubmitEdit} className="flex flex-col gap-1 ">
             <label htmlFor="edit__title">Title:</label>
             <input
               ref={titleInputRef}
@@ -150,6 +173,19 @@ export default function TodoItem({ item, updateList }: Probs) {
               id="edit__content"
               defaultValue={itemU.content}
             ></textarea>
+            <input
+              type="date"
+              className="text-black"
+              name="new__due"
+              id="new__due"
+              value={startDate}
+              onChange={(e) =>
+                setStartDate(
+                  new Date(e.target.value).toLocaleDateString("fr-CA")
+                )
+              }
+            />
+
             <button
               className="bg-slate-700 hover:text-emerald-400 w-fit rounded p-1 mt-2 self-end"
               type="submit"
