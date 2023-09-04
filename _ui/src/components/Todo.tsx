@@ -6,12 +6,12 @@ import { ReactComponent as CloseBtn } from "../assets/close.svg";
 import { useState, useRef } from "react";
 import { SERVER } from "../globals";
 
-interface Probs {
+interface Props {
   item: Todo;
   updateList: () => void;
 }
 
-export default function TodoItem({ item, updateList }: Probs) {
+export default function TodoItem({ item, updateList }: Props) {
   const [expand, setExpand] = useState<boolean>(false);
   const [itemU, setItemU] = useState(item);
   const [editMode, setEditMode] = useState(false);
@@ -20,7 +20,6 @@ export default function TodoItem({ item, updateList }: Probs) {
   const [startDate, setStartDate] = useState(
     new Date(itemU.due).toLocaleDateString("fr-CA") // fr-CA local needed because HTML <input type=date> expects format 'yyyy-MM-dd'
   );
-
   const dateNow = new Date();
   const dateItem = new Date(itemU.due);
   const dueColor = itemU.done
