@@ -50,22 +50,20 @@ export default function TodoList({ filter }: { filter: string }) {
   }, [filter]);
 
   return (
-    <>
-      <div>
-        <ul className="flex flex-col gap-4 items-center justify-center">
-          {todoList.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              item={todo}
-              updateList={() => {
-                getTodoList().then((todos) => {
-                  setTodoList(todos);
-                });
-              }}
-            />
-          ))}
-        </ul>
-      </div>
-    </>
+    <ul className="self-center">
+      {todoList.map((todo) => (
+        <li className="mb-4">
+          <TodoItem
+            key={todo.id}
+            item={todo}
+            updateList={() => {
+              getTodoList().then((todos) => {
+                setTodoList(todos);
+              });
+            }}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }

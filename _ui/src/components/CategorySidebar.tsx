@@ -1,7 +1,9 @@
+import { ReactComponent as Gopher } from "../assets/gopher.svg";
+
 export const dueDateCategories = {
   all: "all",
   today: "today",
-  thisMonth: "thisMonth",
+  thisMonth: "month",
 };
 
 interface props {
@@ -11,9 +13,13 @@ interface props {
 
 export default function Sidebar({ categories, onSelect }: props) {
   return (
-    <div className="pt-28 px-1 border-r border-white border-double h-screen">
+    <div className="pt-4 px-1 border-r border-white border-solid h-screen">
+      <Gopher className="w-24 h-24 mb-4 animate-scale-in" />
       {Object.values(categories).map((cat) => (
-        <div className="mb-4 cursor-pointer" onClick={() => onSelect(cat)}>
+        <div
+          className="mb-4 cursor-pointer font-bold hover:text-emerald-400"
+          onClick={() => onSelect(cat)}
+        >
           {cat}
         </div>
       ))}

@@ -39,7 +39,7 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
 
   return (
     <div
-      className={`relative shadow-md w-[50vw] border border-emerald-400 bg-slate-950 rounded p-3`}
+      className={`self-center relative shadow-md w-[50vw] border border-emerald-400 bg-slate-950 rounded p-3`}
     >
       <div>
         <form onSubmit={handleSubmitNew} className="flex flex-col gap-1">
