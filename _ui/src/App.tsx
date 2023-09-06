@@ -1,7 +1,7 @@
 import "./App.css";
 import TodoList from "./components/TodoList";
 import NewTodo from "./components/NewTodo";
-import Sidebar, { dueDateCategories } from "./components/CategorySidebar";
+import Sidebar, { Categories } from "./components/CategorySidebar";
 import { useState } from "react";
 
 function App() {
@@ -10,16 +10,16 @@ function App() {
     setShowNew(false);
   }
 
-  const [dueDateCat, setDueDateCat] = useState(dueDateCategories.all);
+  const [cat, setCat] = useState(Categories.all);
   function switchCategory(cat: string) {
-    setDueDateCat(cat);
+    setCat(cat);
     setShowNew(false);
   }
 
   return (
     <div className="bg-slate-900 text-zinc-50 font-mono min-h-[100vh]">
       <div className="flex flex-row gap-3">
-        <Sidebar categories={dueDateCategories} onSelect={switchCategory} />
+        <Sidebar categories={Categories} onSelect={switchCategory} />
         <div className="flex flex-col w-full">
           <h1 className="my-4 text-6xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-800">
             GoToDo
@@ -33,7 +33,7 @@ function App() {
           {showNew ? (
             <NewTodo disableNew={disableShowNew} />
           ) : (
-            <TodoList filter={dueDateCat} />
+            <TodoList filter={cat} />
           )}
         </div>
       </div>

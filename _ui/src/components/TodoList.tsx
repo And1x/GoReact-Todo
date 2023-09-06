@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TodoItem from "./Todo";
 import { SERVER } from "../globals";
-import { dueDateCategories } from "./CategorySidebar";
+import { Categories } from "./CategorySidebar";
 
 const getTodoList = async () => {
   return fetch(`${SERVER}/show`).then((data) => data.json());
@@ -22,7 +22,7 @@ export default function TodoList({ filter }: { filter: string }) {
     getTodoList().then((todos) => {
       // filter
       switch (filter) {
-        case dueDateCategories.today: {
+        case Categories.today: {
           const fTodos = todos.filter(
             (todo: Todo) =>
               new Date(todo.due).toDateString() === new Date().toDateString()
@@ -30,7 +30,7 @@ export default function TodoList({ filter }: { filter: string }) {
           setTodoList(fTodos);
           break;
         }
-        case dueDateCategories.thisMonth: {
+        case Categories.thisMonth: {
           const currentDate = new Date();
           const fTodos = todos.filter((todo: Todo) => {
             const todoDate = new Date(todo.due);
@@ -39,6 +39,16 @@ export default function TodoList({ filter }: { filter: string }) {
               todoDate.getMonth() === currentDate.getMonth()
             );
           });
+          setTodoList(fTodos);
+          break;
+        }
+        case Categories.done: {
+          const fTodos = todos.filter((todo: Todo) => todo.done === true);
+          setTodoList(fTodos);
+          break;
+        }
+        case Categories.open: {
+          const fTodos = todos.filter((todo: Todo) => todo.done === false);
           setTodoList(fTodos);
           break;
         }
