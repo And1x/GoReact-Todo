@@ -1,4 +1,4 @@
-import { ReactComponent as Gopher } from "../assets/gopher.svg";
+import { ReactComponent as Gopher } from "../../assets/gopher.svg";
 
 export const Categories = {
   all: "🗒 all",

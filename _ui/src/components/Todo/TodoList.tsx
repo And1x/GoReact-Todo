@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import TodoItem from "./Todo";
-import { SERVER } from "../globals";
+import { SERVER } from "../../globals";
 import { Categories } from "./CategorySidebar";
 
 const getTodoList = async () => {

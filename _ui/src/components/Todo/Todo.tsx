@@ -1,10 +1,10 @@
 import { Todo } from "./TodoList";
-import { ReactComponent as Checkmark } from "../assets/checkmark.svg";
-import { ReactComponent as DeleteBtn } from "../assets/delete.svg";
-import { ReactComponent as EditBtn } from "../assets/edit.svg";
-import { ReactComponent as CloseBtn } from "../assets/close.svg";
+import { ReactComponent as Checkmark } from "../../assets/checkmark.svg";
+import { ReactComponent as DeleteBtn } from "../../assets/delete.svg";
+import { ReactComponent as EditBtn } from "../../assets/edit.svg";
+import { ReactComponent as CloseBtn } from "../../assets/close.svg";
 import { useState, useRef } from "react";
-import { SERVER } from "../globals";
+import { SERVER } from "../../globals";
 
 interface Props {
   item: Todo;

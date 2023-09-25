@@ -1,6 +1,6 @@
-import { ReactComponent as CloseBtn } from "../assets/close.svg";
+import { ReactComponent as CloseBtn } from "../../assets/close.svg";
 import { useRef, useState } from "react";
-import { SERVER } from "../globals";
+import { SERVER } from "../../globals";
 
 export default function NewTodo({ disableNew }: { disableNew: () => void }) {
   const titleInputRef = useRef<HTMLInputElement>(null);
