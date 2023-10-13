@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
 import TodoComponent from "./components/Todo/TodoComponent";
+import Timer from "./components/Pomodoro/Timer";
 
 function App() {
   const [page, setPage] = useState("home");
@@ -10,24 +11,15 @@ function App() {
   };
 
   return (
-    <div className="bg-slate-900 text-zinc-50 font-mono min-h-[100vh]">
+    <div className="bg-slate-950 text-zinc-50  min-h-[100vh]">
       <div className="border-b border-white pl-2 pt-2">
         <Navbar onClick={navigate} />
       </div>
       {page === "home" ? null : page === "todo" ? (
         <TodoComponent />
       ) : page === "pomo" ? ( // <PomoComponent />
-        <div>Pomo</div>
+        <Timer />
       ) : null}
-      {/* <TodoComponent /> */}
-      {/* todo:
-      add Pomodoro component here
-      with routing
-      by stat eg.
-      - Default page
-      - Todo page
-      - Pomodor page
-       */}
     </div>
   );
 }
