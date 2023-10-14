@@ -15,7 +15,7 @@ interface props {
 
 export default function Sidebar({ categories, onSelect }: props) {
   return (
-    <div className="pt-4 px-1 border-r border-white border-solid h-screen">
+    <div className="pt-4 px-1 border-r border-white border-solid h-[calc(100vh-2.5em)]">
       <Gopher className="w-24 h-24 mb-4 animate-scale-in" />
       {Object.values(categories).map((cat) => (
         <div

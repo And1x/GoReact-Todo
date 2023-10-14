@@ -1,6 +1,6 @@
-import { ReactComponent as CloseBtn } from "../../assets/close.svg";
 import { useRef, useState } from "react";
 import { SERVER } from "../../globals";
+import Modal from "../Modal";
 
 export default function NewTodo({ disableNew }: { disableNew: () => void }) {
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -38,31 +38,35 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
   };
 
   return (
-    <div
-      className={`self-center relative shadow-md w-[50vw] border border-emerald-400 bg-slate-950 rounded p-3`}
-    >
-      <div>
-        <form onSubmit={handleSubmitNew} className="flex flex-col gap-1">
+    <Modal onClose={disableNew}>
+      <form onSubmit={handleSubmitNew} className="flex flex-col gap-3 w-[50vw]">
+        <div>
           <label htmlFor="new__title">Title:</label>
           <input
+            // placeholder="Title"
             ref={titleInputRef}
-            className="w-full text-black mb-2 p-1"
+            className="bg-slate-800 rounded outline-none text-sm px-1 py-1 w-full"
             type="text"
             name="new__title"
             id="new__title"
           />
+        </div>
+        <div>
           <label htmlFor="new__content">Content:</label>
           <textarea
+            // placeholder="Content"
             ref={contentInputRef}
-            className="w-full text-black p-1"
+            className="bg-slate-800 rounded outline-none text-sm px-1 py-1 w-full"
             rows={5}
             name="new__content"
             id="new__content"
           ></textarea>
+        </div>
+        <div>
           <label htmlFor="new__due">Due:</label>
           <input
             type="date"
-            className="text-black"
+            className="bg-slate-800 rounded outline-none text-sm px-1 py-1 ml-1"
             name="new__due"
             id="new__due"
             value={startDate}
@@ -70,18 +74,15 @@ export default function NewTodo({ disableNew }: { disableNew: () => void }) {
               setStartDate(new Date(e.target.value).toLocaleDateString("fr-CA"))
             }
           />
-          <button
-            className="bg-slate-700 hover:text-emerald-400 w-fit rounded p-1 mt-2 self-end"
-            type="submit"
-          >
-            create
-          </button>
-        </form>
-        <CloseBtn
-          className="absolute top-1 right-1 w-6 h-6 fill-red-700 cursor-pointer rounded hover:bg-slate-700"
-          onClick={() => disableNew()}
-        />
-      </div>
-    </div>
+        </div>
+
+        <button
+          className="bg-emerald-800 rounded px-2 py-1 mt-1 hover:bg-emerald-600 self-end"
+          type="submit"
+        >
+          create
+        </button>
+      </form>
+    </Modal>
   );
 }

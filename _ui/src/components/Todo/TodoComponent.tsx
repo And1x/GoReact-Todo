@@ -16,7 +16,7 @@ export default function TodoComponent() {
   }
 
   return (
-    <div className="bg-slate-900 text-zinc-50 font-mono min-h-[100vh]">
+    <div className="text-zinc-50 font-mono">
       <div className="flex flex-row gap-3">
         <Sidebar categories={Categories} onSelect={switchCategory} />
         <div className="flex flex-col w-full">

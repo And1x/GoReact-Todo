@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className="bg-slate-950 text-zinc-50  min-h-[100vh]">
-      <div className="border-b border-white pl-2 pt-2">
+      <div className="border-b border-white pl-2 pt-2 h-[2.5em]">
         <Navbar onClick={navigate} />
       </div>
       {page === "home" ? null : page === "todo" ? (
