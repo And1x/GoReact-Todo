@@ -13,7 +13,7 @@ import SettingsForm, { Pomodoro, PreConfSessions } from "./SettingsTimer";
 import { SECONDS, MINUTES, HOURS, displayTime } from "./TimeHelpers";
 
 export default function Timer() {
-  const [pomodoro, setPomodoro] = useState(PreConfSessions.Standard);
+  const [pomodoro, setPomodoro] = useState(PreConfSessions.Default);
   const [showSettings, setShowSettings] = useState(false);
   const [roundCounter, setRoundCounter] = useState(0);
   const [time, setTime] = useState(pomodoro.duration);
@@ -24,11 +24,10 @@ export default function Timer() {
     setShowSettings(false);
   };
 
-  // todo: add other fields - rounds/breaks/task ...
-  const handleSettings = (t: number, r: number) => {
-    setPomodoro(new Pomodoro(t, r));
+  const handleSettings = (p: Pomodoro) => {
+    setPomodoro(p);
     setRoundCounter(0);
-    setTime(t * MINUTES);
+    setTime(p.duration);
     setShowSettings(false);
   };
 

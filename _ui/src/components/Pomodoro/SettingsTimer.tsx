@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 import { MINUTES } from "./TimeHelpers";
 
 export class Pomodoro {
@@ -26,24 +26,38 @@ export class Pomodoro {
 }
 
 export const PreConfSessions = {
-  Default: new Pomodoro(),
-  Standard: new Pomodoro(25, 4, 5, 15),
+  Test: new Pomodoro(),
+  Default: new Pomodoro(25, 4, 5, 15),
   Quick: new Pomodoro(25, 1, 0, 0),
   FourHour: new Pomodoro(50, 4, 10, 30),
   MyFavourite: new Pomodoro(50, 1, 10, 0),
 };
 
 interface Props {
-  saveSettings: (duration: number, rounds: number) => void;
+  saveSettings: (p: Pomodoro) => void;
 }
 
 export default function SettingsForm({ saveSettings }: Props) {
-  const durationRef = useRef<HTMLInputElement>(null);
-  const roundsRef = useRef<HTMLInputElement>(null);
-  const taskRef = useRef<HTMLInputElement>(null);
+  const [formSettings, setFormSettings] = useState(PreConfSessions.Default);
 
   return (
     <div className="flex flex-col gap-2 items-start">
+      <div className="flex gap-3 justify-center w-full mb-2">
+        {Object.keys(PreConfSessions).map((name) => {
+          return (
+            <button
+              className="outline outline-white text-xs font-normal px-2 py-1 rounded hover:outline-emerald-600 hover:bg-slate-900"
+              onClick={() => {
+                setFormSettings(
+                  PreConfSessions[name as keyof typeof PreConfSessions]
+                );
+              }}
+            >
+              {name}
+            </button>
+          );
+        })}
+      </div>
       <div>
         <label className="block" htmlFor="task_input">
           Task:
@@ -53,7 +67,6 @@ export default function SettingsForm({ saveSettings }: Props) {
           type="text"
           name=""
           id="task_input"
-          ref={taskRef}
           placeholder="Have fun:)"
         />
       </div>
@@ -69,8 +82,17 @@ export default function SettingsForm({ saveSettings }: Props) {
             step={5}
             min={0}
             id="duration_input"
-            ref={durationRef}
-            placeholder={"25"}
+            value={formSettings.duration / MINUTES}
+            onChange={(e) =>
+              setFormSettings(
+                new Pomodoro(
+                  e.target.valueAsNumber,
+                  formSettings.round,
+                  formSettings.shortBreak / MINUTES,
+                  formSettings.longBreak / MINUTES
+                )
+              )
+            }
           />
         </div>
         <div>
@@ -83,22 +105,72 @@ export default function SettingsForm({ saveSettings }: Props) {
             step={1}
             min={0}
             id="rounds_input"
-            ref={roundsRef}
-            placeholder="1"
+            value={formSettings.round}
+            onChange={(e) =>
+              setFormSettings(
+                new Pomodoro(
+                  formSettings.duration / MINUTES,
+                  e.target.valueAsNumber,
+                  formSettings.shortBreak / MINUTES,
+                  formSettings.longBreak / MINUTES
+                )
+              )
+            }
+          />
+        </div>
+      </div>
+      <div className="flex gap-3">
+        <div>
+          <label className="" htmlFor="shortBreak_input">
+            Short:
+          </label>
+          <input
+            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            type="number"
+            step={5}
+            min={0}
+            id="shortBreak_input"
+            value={formSettings.shortBreak / MINUTES}
+            onChange={(e) =>
+              setFormSettings(
+                new Pomodoro(
+                  formSettings.duration / MINUTES,
+                  formSettings.round,
+                  e.target.valueAsNumber,
+                  formSettings.longBreak / MINUTES
+                )
+              )
+            }
+          />
+        </div>
+        <div>
+          <label className="" htmlFor="longBreak_input">
+            Long:
+          </label>
+          <input
+            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            type="number"
+            step={5}
+            min={0}
+            id="longBreak_input"
+            value={formSettings.longBreak / MINUTES}
+            onChange={(e) =>
+              setFormSettings(
+                new Pomodoro(
+                  formSettings.duration / MINUTES,
+                  formSettings.round,
+                  formSettings.shortBreak / MINUTES,
+                  e.target.valueAsNumber
+                )
+              )
+            }
           />
         </div>
       </div>
       <button
         className="bg-emerald-800 rounded px-2 hover:bg-emerald-600 self-end"
         onClick={() => {
-          saveSettings(
-            durationRef.current?.valueAsNumber
-              ? durationRef.current?.valueAsNumber
-              : 25,
-            roundsRef.current?.valueAsNumber
-              ? roundsRef.current?.valueAsNumber
-              : 1
-          );
+          saveSettings(formSettings);
         }}
         type="submit"
       >
