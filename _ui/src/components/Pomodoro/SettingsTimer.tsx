@@ -59,11 +59,11 @@ export default function SettingsForm({ saveSettings }: Props) {
         })}
       </div>
       <div>
-        <label className="block" htmlFor="task_input">
+        <label className="block text-sm font-normal w-24" htmlFor="task_input">
           Task:
         </label>
         <input
-          className="bg-slate-800 rounded outline-none text-sm w-[28rem] px-1 py-1"
+          className="bg-slate-800 rounded outline-none text-lg w-[28rem] px-1 py-1"
           type="text"
           name=""
           id="task_input"
@@ -73,11 +73,14 @@ export default function SettingsForm({ saveSettings }: Props) {
 
       <div className="flex gap-3">
         <div>
-          <label className="" htmlFor="duration_input">
+          <label
+            className="block text-sm font-normal w-24"
+            htmlFor="duration_input"
+          >
             Time:
           </label>
           <input
-            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            className="bg-slate-800 rounded outline-none text-lg w-[74px] px-1 py-1 ml-1"
             type="number"
             step={5}
             min={0}
@@ -96,11 +99,14 @@ export default function SettingsForm({ saveSettings }: Props) {
           />
         </div>
         <div>
-          <label className="" htmlFor="rounds_input">
+          <label
+            className="block text-sm font-normal w-24"
+            htmlFor="rounds_input"
+          >
             Rounds:
           </label>
           <input
-            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            className="bg-slate-800 rounded outline-none text-lg w-[74px] px-1 py-1 ml-1"
             type="number"
             step={1}
             min={0}
@@ -121,11 +127,14 @@ export default function SettingsForm({ saveSettings }: Props) {
       </div>
       <div className="flex gap-3">
         <div>
-          <label className="" htmlFor="shortBreak_input">
-            Short:
+          <label
+            className="block text-sm font-normal w-24"
+            htmlFor="shortBreak_input"
+          >
+            Short Break:
           </label>
           <input
-            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            className="bg-slate-800 rounded outline-none text-lg w-[74px] px-1 py-1 ml-1"
             type="number"
             step={5}
             min={0}
@@ -144,11 +153,14 @@ export default function SettingsForm({ saveSettings }: Props) {
           />
         </div>
         <div>
-          <label className="" htmlFor="longBreak_input">
-            Long:
+          <label
+            className="block text-sm font-normal w-24"
+            htmlFor="longBreak_input"
+          >
+            Long Break:
           </label>
           <input
-            className="bg-slate-800 rounded outline-none text-sm w-16 px-1 py-1 ml-1"
+            className="bg-slate-800 rounded outline-none text-lg w-[74px] px-1 py-1 ml-1"
             type="number"
             step={5}
             min={0}
