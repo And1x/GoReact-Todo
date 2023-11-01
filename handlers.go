@@ -64,9 +64,14 @@ func (app *app) getTodosHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	todoJSON, err := json.Marshal(todos)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(todos)
+	w.Write(todoJSON)
 }
 
 func (app *app) editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,9 +92,14 @@ func (app *app) editTodoDoneHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	todoJSON, err := json.Marshal(todo)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(todo)
+	w.Write(todoJSON)
 }
 
 func (app *app) editTodoHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +107,6 @@ func (app *app) editTodoHandler(w http.ResponseWriter, r *http.Request) {
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
 
-	// decode request.body todo
 	decodeReq := json.NewDecoder(r.Body)
 	var todo Todo
 	err := decodeReq.Decode(&todo)
@@ -112,9 +121,14 @@ func (app *app) editTodoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	todoJSON, err := json.Marshal(storedTodo)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(storedTodo)
+	w.Write(todoJSON)
 }
 
 func (app *app) deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +138,6 @@ func (app *app) deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-
 	err = app.todos.Delete(id)
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -136,7 +149,6 @@ func (app *app) deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 
-	// decode request.body todo
 	decodeReq := json.NewDecoder(r.Body)
 	var todo Todo
 	err := decodeReq.Decode(&todo)
@@ -145,13 +157,18 @@ func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todoList, err := app.todos.New(todo)
+	storedTodo, err := app.todos.New(todo)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	todoJSON, err := json.Marshal(storedTodo)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(todoList)
+	w.Write(todoJSON)
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 )
 
@@ -21,7 +20,7 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
-func (tm *TodoModel) GetAll() ([]byte, error) {
+func (tm *TodoModel) GetAll() ([]*Todo, error) {
 	stmt := `SELECT * FROM todo;`
 	rows, err := tm.DB.Query(stmt)
 	if err != nil {
@@ -38,12 +37,11 @@ func (tm *TodoModel) GetAll() ([]byte, error) {
 		}
 		todos = append(todos, t)
 	}
-
-	return json.Marshal(todos)
+	return todos, nil
 }
 
 // todo: throw EditState and just use Edit?
-func (tm *TodoModel) EditState(id int) ([]byte, error) {
+func (tm *TodoModel) EditState(id int) (*Todo, error) {
 
 	var prevState bool
 	err := tm.DB.QueryRow(`SELECT done FROM todo WHERE id = ?`, id).Scan(&prevState)
@@ -56,10 +54,10 @@ func (tm *TodoModel) EditState(id int) ([]byte, error) {
 	if err := tm.DB.QueryRow(stmt, !prevState, id).Scan(&t.Id, &t.Title, &t.Content, &t.Done, &t.Due); err != nil {
 		return nil, err
 	}
-	return json.Marshal(t)
+	return &t, nil
 }
 
-func (tm *TodoModel) Edit(todo Todo) ([]byte, error) {
+func (tm *TodoModel) Edit(todo Todo) (*Todo, error) {
 
 	stmt := `
 	UPDATE todo SET title = ?, content = ?, done = ?, due = ? WHERE id = ? RETURNING *
@@ -68,10 +66,10 @@ func (tm *TodoModel) Edit(todo Todo) ([]byte, error) {
 	if err := tm.DB.QueryRow(stmt, todo.Title, todo.Content, todo.Done, todo.Due, todo.Id).Scan(&t.Id, &t.Title, &t.Content, &t.Done, &t.Due); err != nil {
 		return nil, err
 	}
-	return json.Marshal(t)
+	return &t, nil
 }
 
-func (tm *TodoModel) New(todo Todo) ([]byte, error) {
+func (tm *TodoModel) New(todo Todo) (*Todo, error) {
 
 	stmt := `
 	INSERT INTO todo(title,content,done,due) VALUES( ?, ?, ?, ?) RETURNING *;
@@ -80,7 +78,7 @@ func (tm *TodoModel) New(todo Todo) ([]byte, error) {
 	if err := tm.DB.QueryRow(stmt, todo.Title, todo.Content, todo.Done, todo.Due).Scan(&t.Id, &t.Title, &t.Content, &t.Done, &t.Due); err != nil {
 		return nil, err
 	}
-	return json.Marshal(t)
+	return &t, nil
 }
 
 func (tm *TodoModel) Delete(id int) error {

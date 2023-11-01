@@ -21,11 +21,11 @@ var uiFS fs.FS
 
 type app struct {
 	todos interface {
-		GetAll() ([]byte, error)
-		EditState(id int) ([]byte, error)
-		Edit(todo Todo) ([]byte, error)
+		GetAll() ([]*Todo, error)
+		EditState(id int) (*Todo, error)
+		Edit(todo Todo) (*Todo, error)
 		Delete(id int) error
-		New(todo Todo) ([]byte, error)
+		New(todo Todo) (*Todo, error)
 	}
 }
 
