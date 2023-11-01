@@ -1,9 +1,8 @@
 package main
 
 import (
+	"database/sql"
 	"embed"
-	"flag"
-	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 //go:embed _ui/dist
@@ -60,18 +60,33 @@ func (app *app) routes() http.Handler {
 func main() {
 
 	port := os.Getenv("VITE_SERVER_PORT")
-	dirName := flag.String("dir", "data", "Directory of stored Todos")
-	fName := flag.String("f", "todoData", "File Name of stored Todos")
-	flag.Parse()
+
+	db, err := openDB("database.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Sqlite running")
 
 	app := &app{
-		todos: &TodosFileStorage{dirName: *dirName, fileName: *fName, fileType: ".json"},
+		todos: &TodoModel{DB: db},
 	}
 	s := &http.Server{
 		Addr:    port,
 		Handler: app.routes(),
 	}
 
-	fmt.Printf("Visit: %v%v\n", os.Getenv("VITE_SERVER_ADDR"), port)
+	log.Printf("Visit: %v%v\n", os.Getenv("VITE_SERVER_ADDR"), port)
 	log.Fatal(s.ListenAndServe())
+}
+
+func openDB(dbName string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", "./data/"+dbName)
+	if err != nil {
+		return nil, err
+	}
+	// create tables if they don't exists
+	if err = createTables(db); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
