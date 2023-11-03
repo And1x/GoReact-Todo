@@ -45,6 +45,7 @@ func CreatePomoTable(db *sql.DB) error {
 		duration INTEGER NOT NULL, 
 		started INTEGER, 
 		finished INTEGER,
+		todoid INTEGER,
 		FOREIGN KEY(todoid) REFERENCES todo(id) 
 		);`
 	if _, err := db.Exec(stmt); err != nil {

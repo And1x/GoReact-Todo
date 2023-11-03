@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/And1x/GoReact-Todo/models"
+	"github.com/And1x/GoReact-Todo/models/sqlite/pomo"
 	"github.com/And1x/GoReact-Todo/models/sqlite/todo"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -28,6 +29,10 @@ type app struct {
 		Edit(todo models.Todo) (*models.Todo, error)
 		Delete(id int) error
 		New(todo models.Todo) (*models.Todo, error)
+	}
+	pomos interface {
+		GetAll() ([]*models.Pomo, error)
+		New(pomo *models.Pomo) error
 	}
 }
 
@@ -56,6 +61,12 @@ func (app *app) routes() http.Handler {
 	mux.Put("/edit", app.editTodoHandler)
 	mux.Delete("/todo", app.deleteTodoHandler)
 	mux.Post("/new", app.newTodoHandler)
+
+	mux.Route("/pomos", func(mux chi.Router) {
+		// mux.Get("/", app.getPomosHandler)
+		mux.Post("/", app.newPomoHandler)
+	})
+
 	return mux
 }
 
@@ -71,6 +82,7 @@ func main() {
 
 	app := &app{
 		todos: &todo.TodoModel{DB: db},
+		pomos: &pomo.PomoModel{DB: db},
 	}
 	s := &http.Server{
 		Addr:    port,
@@ -89,6 +101,9 @@ func openDB(dbName string) (*sql.DB, error) {
 	}
 	// create tables if they don't exists
 	if err = models.CreateTodoTable(db); err != nil {
+		return nil, err
+	}
+	if err = models.CreatePomoTable(db); err != nil {
 		return nil, err
 	}
 	return db, nil

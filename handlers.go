@@ -174,3 +174,27 @@ func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(todoJSON)
 }
+
+// func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
+
+// }
+
+func (app *app) newPomoHandler(w http.ResponseWriter, r *http.Request) {
+
+	decodeReq := json.NewDecoder(r.Body)
+	var pomo models.Pomo
+	if err := decodeReq.Decode(&pomo); err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := app.pomos.New(&pomo); err != nil {
+		log.Println(err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("stored: ", pomo)
+	log.Println("stored: ", pomo)
+	w.WriteHeader(http.StatusAccepted)
+}

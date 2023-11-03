@@ -2,13 +2,21 @@ import { useState } from "react";
 import { MINUTES } from "./TimeHelpers";
 
 export class Pomodoro {
+  task: string;
   duration: number;
   round: number;
   shortBreak: number;
   longBreak: number;
 
-  constructor(duration = 0.05, round = 8, shortBreak = 0.1, longBreak = 0.2) {
-    (this.duration = duration * MINUTES),
+  constructor(
+    task = "Have fun:)",
+    duration = 0.05,
+    round = 8,
+    shortBreak = 0.1,
+    longBreak = 0.2
+  ) {
+    (this.task = task),
+      (this.duration = duration * MINUTES),
       (this.round = round),
       (this.shortBreak = shortBreak * MINUTES),
       (this.longBreak = longBreak * MINUTES);
@@ -27,10 +35,10 @@ export class Pomodoro {
 
 export const PreConfSessions = {
   Test: new Pomodoro(),
-  Default: new Pomodoro(25, 4, 5, 15),
-  Quick: new Pomodoro(25, 1, 0, 0),
-  FourHour: new Pomodoro(50, 4, 10, 30),
-  MyFavourite: new Pomodoro(50, 1, 10, 0),
+  Default: new Pomodoro("Default Pomodoro Session", 25, 4, 5, 15),
+  Quick: new Pomodoro("Quick Pomodoro Session", 25, 1, 0, 0),
+  FourHour: new Pomodoro("Four Hour Pomodoro Session", 50, 4, 10, 30),
+  MyFavourite: new Pomodoro("My favourite Pomodoro Session", 50, 1, 10, 0),
 };
 
 interface Props {
@@ -67,7 +75,18 @@ export default function SettingsForm({ saveSettings }: Props) {
           type="text"
           name=""
           id="task_input"
-          placeholder="Have fun:)"
+          placeholder={formSettings.task}
+          onChange={(e) =>
+            setFormSettings(
+              new Pomodoro(
+                e.target.value,
+                formSettings.duration / MINUTES,
+                formSettings.round,
+                formSettings.shortBreak / MINUTES,
+                formSettings.longBreak / MINUTES
+              )
+            )
+          }
         />
       </div>
 
@@ -89,6 +108,7 @@ export default function SettingsForm({ saveSettings }: Props) {
             onChange={(e) =>
               setFormSettings(
                 new Pomodoro(
+                  formSettings.task,
                   e.target.valueAsNumber,
                   formSettings.round,
                   formSettings.shortBreak / MINUTES,
@@ -115,6 +135,7 @@ export default function SettingsForm({ saveSettings }: Props) {
             onChange={(e) =>
               setFormSettings(
                 new Pomodoro(
+                  formSettings.task,
                   formSettings.duration / MINUTES,
                   e.target.valueAsNumber,
                   formSettings.shortBreak / MINUTES,
@@ -143,6 +164,7 @@ export default function SettingsForm({ saveSettings }: Props) {
             onChange={(e) =>
               setFormSettings(
                 new Pomodoro(
+                  formSettings.task,
                   formSettings.duration / MINUTES,
                   formSettings.round,
                   e.target.valueAsNumber,
@@ -169,6 +191,7 @@ export default function SettingsForm({ saveSettings }: Props) {
             onChange={(e) =>
               setFormSettings(
                 new Pomodoro(
+                  formSettings.task,
                   formSettings.duration / MINUTES,
                   formSettings.round,
                   formSettings.shortBreak / MINUTES,

@@ -11,6 +11,7 @@ import { ReactComponent as ReplayIcon } from "../../assets/replay.svg";
 import Modal from "../Modal";
 import SettingsForm, { Pomodoro, PreConfSessions } from "./SettingsTimer";
 import { SECONDS, MINUTES, HOURS, displayTime } from "./TimeHelpers";
+import { handleNewPomo } from "./httpRequests";
 
 export default function Timer() {
   const [pomodoro, setPomodoro] = useState(PreConfSessions.Default);
@@ -44,6 +45,7 @@ export default function Timer() {
   useEffect(() => {
     if (isRunning) {
       console.log("T1: Start: ", Date.now());
+      const startTime = Date.now();
       intervalRef.current = setInterval(() => {
         setTime((curTime) => {
           if (curTime <= 0) {
@@ -53,7 +55,7 @@ export default function Timer() {
             }
             setIsRunning(false);
             clearInterval(intervalRef.current);
-
+            handleNewPomo(pomodoro, startTime, Date.now());
             return pomodoro.getTime(roundCounter + 1);
           } else {
             return curTime - 1 * SECONDS;
