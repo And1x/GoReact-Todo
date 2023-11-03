@@ -11,6 +11,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/And1x/GoReact-Todo/models"
 )
 
 // note: THIS IS FOR DEVMODE ONLY
@@ -108,7 +110,7 @@ func (app *app) editTodoHandler(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
 	decodeReq := json.NewDecoder(r.Body)
-	var todo Todo
+	var todo models.Todo
 	err := decodeReq.Decode(&todo)
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -150,7 +152,7 @@ func (app *app) deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 	decodeReq := json.NewDecoder(r.Body)
-	var todo Todo
+	var todo models.Todo
 	err := decodeReq.Decode(&todo)
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)

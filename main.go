@@ -9,6 +9,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/And1x/GoReact-Todo/models"
+	"github.com/And1x/GoReact-Todo/models/sqlite/todo"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -21,11 +23,11 @@ var uiFS fs.FS
 
 type app struct {
 	todos interface {
-		GetAll() ([]*Todo, error)
-		EditState(id int) (*Todo, error)
-		Edit(todo Todo) (*Todo, error)
+		GetAll() ([]*models.Todo, error)
+		EditState(id int) (*models.Todo, error)
+		Edit(todo models.Todo) (*models.Todo, error)
 		Delete(id int) error
-		New(todo Todo) (*Todo, error)
+		New(todo models.Todo) (*models.Todo, error)
 	}
 }
 
@@ -68,7 +70,7 @@ func main() {
 	log.Println("Sqlite running")
 
 	app := &app{
-		todos: &TodoModel{DB: db},
+		todos: &todo.TodoModel{DB: db},
 	}
 	s := &http.Server{
 		Addr:    port,
@@ -80,12 +82,13 @@ func main() {
 }
 
 func openDB(dbName string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./data/"+dbName)
+	dsn := "?_foreign_keys=true"
+	db, err := sql.Open("sqlite3", "./data/"+dbName+dsn)
 	if err != nil {
 		return nil, err
 	}
 	// create tables if they don't exists
-	if err = createTables(db); err != nil {
+	if err = models.CreateTodoTable(db); err != nil {
 		return nil, err
 	}
 	return db, nil

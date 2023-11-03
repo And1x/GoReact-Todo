@@ -1,4 +1,4 @@
-module example.com/pogo
+module github.com/And1x/GoReact-Todo
 
 go 1.19
 

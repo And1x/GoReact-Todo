@@ -1,31 +1,33 @@
-package main
+package todo
 
 import (
 	"database/sql"
-	"os"
 	"reflect"
 	"testing"
+
+	"github.com/And1x/GoReact-Todo/models"
+	"github.com/And1x/GoReact-Todo/models/sqlite"
 )
 
-// generate a TEST-DB
-func newTestDB(t *testing.T) (*sql.DB, func()) {
-	tstDBLocation := "./data/TEST_DB.db"
-	db, err := sql.Open("sqlite3", tstDBLocation)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err = createTables(db); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := db.Exec("INSERT INTO todo(title, content, done, due) VALUES('tsttitle','c',false,'2024-10-25');"); err != nil {
-		t.Fatal(err)
-	}
+// // generate a TEST-DB
+// func NewTestDB(t *testing.T) (*sql.DB, func()) {
+// 	tstDBLocation := "./data/TEST_DB.db"
+// 	db, err := sql.Open("sqlite3", tstDBLocation)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = createTodoTable(db); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if _, err := db.Exec("INSERT INTO todo(title, content, done, due) VALUES('tsttitle','c',false,'2024-10-25');"); err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	return db, func() {
-		db.Close()
-		os.Remove("./data/TEST_DB.db")
-	}
-}
+// 	return db, func() {
+// 		db.Close()
+// 		os.Remove("./data/TEST_DB.db")
+// 	}
+// }
 
 func TestGetAll(t *testing.T) {
 
@@ -34,7 +36,7 @@ func TestGetAll(t *testing.T) {
 	}
 
 	t.Run("Get All Rows of todo", func(t *testing.T) {
-		db, dbRemove := newTestDB(t)
+		db, dbRemove := sqlite.NewTestDB(t)
 		defer dbRemove()
 
 		m := TodoModel{db}
@@ -43,12 +45,12 @@ func TestGetAll(t *testing.T) {
 		if err != nil {
 			t.Errorf("failed calling GetAll()\n err: %v", err)
 		}
-		wantTodos := []*Todo{{Id: 1, Title: "tsttitle", Content: "c", Done: false, Due: "2024-10-25"}}
+		wantTodos := []*models.Todo{{Id: 1, Title: "tsttitle", Content: "c", Done: false, Due: "2024-10-25"}}
 		if !reflect.DeepEqual(todos, wantTodos) {
 			t.Errorf("want %v, got %v", *wantTodos[0], *todos[0]) // only one row is there so look at em
 		}
 
-		wrongTodos := []*Todo{{Id: 1, Title: "not there", Content: "abc", Done: false, Due: ""}}
+		wrongTodos := []*models.Todo{{Id: 1, Title: "not there", Content: "abc", Done: false, Due: ""}}
 		if reflect.DeepEqual(todos, wrongTodos) {
 			t.Errorf("want %v, not to be %v", *wrongTodos[0], *todos[0])
 		}
@@ -63,13 +65,13 @@ func TestEditState(t *testing.T) {
 	tests := []struct {
 		name      string
 		todoID    int
-		wantTodo  *Todo
+		wantTodo  *models.Todo
 		wantError error
 	}{
 		{
 			name:      "Valid ID",
 			todoID:    1,
-			wantTodo:  &Todo{Id: 1, Title: "tsttitle", Content: "c", Done: true, Due: "2024-10-25"},
+			wantTodo:  &models.Todo{Id: 1, Title: "tsttitle", Content: "c", Done: true, Due: "2024-10-25"},
 			wantError: nil,
 		},
 		{
@@ -82,7 +84,7 @@ func TestEditState(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, dbRemove := newTestDB(t)
+			db, dbRemove := sqlite.NewTestDB(t)
 			defer dbRemove()
 
 			m := TodoModel{db}
@@ -106,26 +108,26 @@ func TestEdit(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		changedTodo *Todo
-		wantTodo    *Todo
+		changedTodo *models.Todo
+		wantTodo    *models.Todo
 		wantError   error
 	}{
 		{
 			name:        "Valid Todo",
-			changedTodo: &Todo{Id: 1, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
-			wantTodo:    &Todo{Id: 1, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
+			changedTodo: &models.Todo{Id: 1, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
+			wantTodo:    &models.Todo{Id: 1, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
 			wantError:   nil,
 		},
 		{
 			name:        "Invalid/Non existing Todo",
-			changedTodo: &Todo{Id: -103, Title: "tsttitle", Content: "c", Done: true, Due: ""},
+			changedTodo: &models.Todo{Id: -103, Title: "tsttitle", Content: "c", Done: true, Due: ""},
 			wantTodo:    nil,
 			wantError:   sql.ErrNoRows,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, dbRemove := newTestDB(t)
+			db, dbRemove := sqlite.NewTestDB(t)
 			defer dbRemove()
 
 			m := TodoModel{db}
@@ -149,27 +151,27 @@ func TestNew(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		addTodo   Todo
-		wantTodo  *Todo
+		addTodo   models.Todo
+		wantTodo  *models.Todo
 		wantError error
 	}{
 		{
 			name:      "New Valid Todo",
-			addTodo:   Todo{Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
-			wantTodo:  &Todo{Id: 2, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
+			addTodo:   models.Todo{Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
+			wantTodo:  &models.Todo{Id: 2, Title: "This title got an edit", Content: "content too", Done: true, Due: "2024-10-25"},
 			wantError: nil,
 		},
 		{
 			name:      "Empty Todo",
-			addTodo:   Todo{},
-			wantTodo:  &Todo{Id: 2, Title: "", Content: "", Done: false, Due: ""},
+			addTodo:   models.Todo{},
+			wantTodo:  &models.Todo{Id: 2, Title: "", Content: "", Done: false, Due: ""},
 			wantError: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, dbRemove := newTestDB(t)
+			db, dbRemove := sqlite.NewTestDB(t)
 			defer dbRemove()
 
 			m := TodoModel{db}
@@ -214,7 +216,7 @@ func TestDelete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, dbRemove := newTestDB(t)
+			db, dbRemove := sqlite.NewTestDB(t)
 			defer dbRemove()
 
 			m := TodoModel{db}
