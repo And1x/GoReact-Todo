@@ -9,15 +9,18 @@ import { ReactComponent as PauseIcon } from "../../assets/pause.svg";
 import { ReactComponent as PlayIcon } from "../../assets/play_arrow.svg";
 import { ReactComponent as ReplayIcon } from "../../assets/replay.svg";
 import Modal from "../Modal";
-import SettingsForm, { Pomodoro, PreConfSessions } from "./SettingsTimer";
+import SettingsForm, {
+  PomodoroSession,
+  PreConfSessions,
+} from "./SettingsTimer";
 import { SECONDS, MINUTES, HOURS, displayTime } from "./TimeHelpers";
-import { handleNewPomo } from "./httpRequests";
+import { handleSaveNewPomo } from "./httpRequests";
 
 export default function Timer() {
-  const [pomodoro, setPomodoro] = useState(PreConfSessions.Default);
+  const [pomSession, setPomSession] = useState(PreConfSessions.Default);
   const [showSettings, setShowSettings] = useState(false);
   const [roundCounter, setRoundCounter] = useState(0);
-  const [time, setTime] = useState(pomodoro.duration);
+  const [time, setTime] = useState(pomSession.pomo.duration);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number>();
 
@@ -25,38 +28,43 @@ export default function Timer() {
     setShowSettings(false);
   };
 
-  const handleSettings = (p: Pomodoro) => {
-    setPomodoro(p);
+  const handleSettings = (p: PomodoroSession) => {
+    setPomSession(p);
     setRoundCounter(0);
-    setTime(p.duration);
+    setTime(p.pomo.duration);
     setShowSettings(false);
   };
 
   const handleSkipBreak = () => {
-    if (roundCounter < pomodoro.round * 2) {
+    if (roundCounter < pomSession.round * 2) {
       setRoundCounter(roundCounter + 1);
     }
 
     setIsRunning(false);
-    setTime(pomodoro.getTime(roundCounter + 1));
+    setTime(pomSession.getTime(roundCounter + 1));
     clearInterval(intervalRef.current);
   };
+
+  function isBreak(roundCounter: number) {
+    return (roundCounter + 1) % 2 === 0;
+  }
 
   useEffect(() => {
     if (isRunning) {
       console.log("T1: Start: ", Date.now());
-      const startTime = Date.now();
+      pomSession.pomo.started = Date.now();
       intervalRef.current = setInterval(() => {
         setTime((curTime) => {
           if (curTime <= 0) {
             console.log("T1: End: ", Date.now());
-            if (roundCounter < pomodoro.round * 2) {
+            pomSession.pomo.finished = Date.now();
+            if (roundCounter < pomSession.round * 2) {
               setRoundCounter(roundCounter + 1);
             }
             setIsRunning(false);
             clearInterval(intervalRef.current);
-            handleNewPomo(pomodoro, startTime, Date.now());
-            return pomodoro.getTime(roundCounter + 1);
+            !isBreak(roundCounter) ? handleSaveNewPomo(pomSession.pomo) : null;
+            return pomSession.getTime(roundCounter + 1);
           } else {
             return curTime - 1 * SECONDS;
           }
@@ -64,7 +72,7 @@ export default function Timer() {
       }, SECONDS);
     }
     return () => clearInterval(intervalRef.current);
-  }, [isRunning, roundCounter, pomodoro]);
+  }, [isRunning, roundCounter, pomSession]);
 
   return (
     <>
@@ -72,12 +80,12 @@ export default function Timer() {
         <div className="w-80 h-80 relative">
           <CircularProgressbarWithChildren
             strokeWidth={9}
-            value={(100 / pomodoro.getTime(roundCounter)) * time} // in percent
+            value={(100 / pomSession.getTime(roundCounter)) * time} // in percent
             styles={buildStyles({
               rotation: 1,
               strokeLinecap: "butt",
               pathColor: "#082f42",
-              trailColor: (roundCounter + 1) % 2 == 0 ? "#fbbf24" : "#10b981",
+              trailColor: isBreak(roundCounter) ? "#fbbf24" : "#10b981",
               pathTransition: isRunning ? "" : "none",
             })}
           >
@@ -93,10 +101,10 @@ export default function Timer() {
                 className="absolute left-[50%] -translate-x-1/2"
                 title="rounds - breaks don't count as round"
               >
-                {Math.floor((roundCounter + 1) / 2)} of {pomodoro.round}
+                {Math.floor((roundCounter + 1) / 2)} of {pomSession.round}
               </div>
 
-              {(roundCounter + 1) % 2 == 0 ? (
+              {isBreak(roundCounter) ? (
                 <div
                   className="absolute left-[50%] -translate-x-1/2 top-20 text-rose-600 cursor-pointer"
                   onClick={() => handleSkipBreak()}
@@ -121,7 +129,7 @@ export default function Timer() {
             className="w-12 h-12 font-bold text-lg rounded px-1 py-1 outline outline-1 outline-violet-600 hover:outline-2"
             onClick={() => {
               // show Settings to restart when all rounds are over
-              if (roundCounter === pomodoro.round * 2) {
+              if (roundCounter === pomSession.round * 2) {
                 setShowSettings(true);
               } else {
                 // usual pause/play button
@@ -142,7 +150,7 @@ export default function Timer() {
             className="w-12 h-12 font-bold text-lg rounded px-2 py-1 outline outline-1 outline-violet-600 hover:outline-2"
             onClick={() => {
               setIsRunning(false);
-              setTime(pomodoro.getTime(roundCounter));
+              setTime(pomSession.getTime(roundCounter));
             }}
           >
             <ReplayIcon className="w-8 h-8 fill-white" />

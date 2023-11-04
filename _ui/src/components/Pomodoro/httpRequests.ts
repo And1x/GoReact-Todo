@@ -1,11 +1,7 @@
 import { Pomodoro } from "./SettingsTimer";
 import { SERVER } from "../../globals";
 
-export const handleNewPomo = async (
-  pomo: Pomodoro,
-  startTime: number,
-  endTime: number
-) => {
+export const handleSaveNewPomo = async (pomo: Pomodoro) => {
   try {
     const response = await fetch(`${SERVER}/pomos`, {
       method: "POST",
@@ -13,8 +9,8 @@ export const handleNewPomo = async (
       body: JSON.stringify({
         task: pomo.task,
         duration: pomo.duration,
-        started: startTime,
-        finished: endTime,
+        started: pomo.started,
+        finished: pomo.finished,
         todoid: 0, // todo: get reference from todos
       }),
     });
