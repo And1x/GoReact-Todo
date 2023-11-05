@@ -15,7 +15,12 @@ export interface Todo {
   due: Date;
 }
 
-export default function TodoList({ filter }: { filter: string }) {
+interface Props {
+  filter: string;
+  handleGoToPomo: (itemTitle: string, itemID: number) => void;
+}
+
+export default function TodoList({ filter, handleGoToPomo }: Props) {
   const [todoList, setTodoList] = useState<Todo[]>([]);
 
   useEffect(() => {
@@ -71,6 +76,7 @@ export default function TodoList({ filter }: { filter: string }) {
                 setTodoList(todos);
               });
             }}
+            handleGoToPomo={handleGoToPomo}
           />
         </li>
       ))}

@@ -195,6 +195,5 @@ func (app *app) newPomoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("stored: ", pomo)
-	log.Println("stored: ", pomo)
 	w.WriteHeader(http.StatusAccepted)
 }

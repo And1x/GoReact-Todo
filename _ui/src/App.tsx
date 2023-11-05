@@ -2,12 +2,22 @@ import { useState } from "react";
 import Navbar from "./components/Navbar";
 import TodoComponent from "./components/Todo/TodoComponent";
 import Timer from "./components/Pomodoro/Timer";
+import { TodoAsPomo } from "./components/Pomodoro/SettingsTimer";
 
 function App() {
   const [page, setPage] = useState("home");
+  const [todoAsPomo, setTodoAsPomo] = useState<TodoAsPomo>({
+    todoID: -1,
+    todoTask: "",
+  });
 
   const navigate = (pageName: string) => {
     setPage(pageName);
+  };
+  const handleGoToPomo = (itemTask: string, itemID: number) => {
+    navigate("pomo");
+    setTodoAsPomo({ todoID: itemID, todoTask: itemTask });
+    console.log(itemTask, itemID);
   };
 
   return (
@@ -16,9 +26,9 @@ function App() {
         <Navbar onClick={navigate} />
       </div>
       {page === "home" ? null : page === "todo" ? (
-        <TodoComponent />
+        <TodoComponent handleGoToPomo={handleGoToPomo} />
       ) : page === "pomo" ? ( // <PomoComponent />
-        <Timer />
+        <Timer todoAsPomo={todoAsPomo} />
       ) : null}
     </div>
   );

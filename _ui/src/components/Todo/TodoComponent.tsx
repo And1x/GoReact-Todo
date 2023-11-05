@@ -3,7 +3,11 @@ import NewTodo from "./NewTodo";
 import Sidebar, { Categories } from "./CategorySidebar";
 import { useState } from "react";
 
-export default function TodoComponent() {
+interface Props {
+  handleGoToPomo: (itemTitle: string, itemID: number) => void;
+}
+
+export default function TodoComponent({ handleGoToPomo }: Props) {
   const [showNew, setShowNew] = useState(false);
   function disableShowNew() {
     setShowNew(false);
@@ -32,7 +36,7 @@ export default function TodoComponent() {
           {showNew ? (
             <NewTodo disableNew={disableShowNew} />
           ) : (
-            <TodoList filter={cat} />
+            <TodoList filter={cat} handleGoToPomo={handleGoToPomo} />
           )}
         </div>
       </div>

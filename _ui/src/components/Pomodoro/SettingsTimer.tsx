@@ -52,6 +52,11 @@ export class PomodoroSession {
   }
 }
 
+export type TodoAsPomo = {
+  todoTask: string;
+  todoID: number;
+};
+
 export const PreConfSessions = {
   Test: new PomodoroSession(),
   Default: new PomodoroSession(
@@ -82,10 +87,33 @@ export const PreConfSessions = {
 
 interface Props {
   saveSettings: (p: PomodoroSession) => void;
+  todoAsPomo: TodoAsPomo;
 }
 
-export default function SettingsForm({ saveSettings }: Props) {
+export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
   const [formSettings, setFormSettings] = useState(PreConfSessions.Default);
+
+  // if Timer gets called by a Todo use this settings:
+  if (todoAsPomo.todoID > 0) {
+    setFormSettings(
+      new PomodoroSession(
+        new Pomodoro(
+          todoAsPomo.todoTask,
+          0.05,
+          undefined,
+          undefined,
+          todoAsPomo.todoID
+        ),
+        1,
+        10,
+        0
+      )
+    );
+
+    // reset it to avoid infinite loop
+    todoAsPomo.todoID = -1;
+    todoAsPomo.todoTask = "";
+  }
 
   return (
     <div className="flex flex-col gap-2 items-start">
@@ -104,6 +132,9 @@ export default function SettingsForm({ saveSettings }: Props) {
             </button>
           );
         })}
+        <div onClick={() => setFormSettings(PreConfSessions.Default)}>
+          Resest
+        </div>
       </div>
       <div>
         <label className="block text-sm font-normal w-24" htmlFor="task_input">

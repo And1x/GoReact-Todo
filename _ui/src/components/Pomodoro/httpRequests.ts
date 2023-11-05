@@ -11,14 +11,13 @@ export const handleSaveNewPomo = async (pomo: Pomodoro) => {
         duration: pomo.duration,
         started: pomo.started,
         finished: pomo.finished,
-        todoid: 0, // todo: get reference from todos
+        todoid: pomo.todoid,
       }),
     });
     if (!response.ok) {
       throw new Error(`Error! status: ${response.status}`);
     } else {
-      const result = await response.json();
-      console.log(result);
+      console.log(response);
     }
   } catch (err) {
     // note: handle this err

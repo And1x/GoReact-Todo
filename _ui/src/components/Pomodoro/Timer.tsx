@@ -12,13 +12,19 @@ import Modal from "../Modal";
 import SettingsForm, {
   PomodoroSession,
   PreConfSessions,
+  TodoAsPomo,
 } from "./SettingsTimer";
 import { SECONDS, MINUTES, HOURS, displayTime } from "./TimeHelpers";
 import { handleSaveNewPomo } from "./httpRequests";
 
-export default function Timer() {
+interface Props {
+  todoAsPomo: TodoAsPomo;
+}
+
+export default function Timer({ todoAsPomo }: Props) {
+  // export default function Timer() {
   const [pomSession, setPomSession] = useState(PreConfSessions.Default);
-  const [showSettings, setShowSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
   const [roundCounter, setRoundCounter] = useState(0);
   const [time, setTime] = useState(pomSession.pomo.duration);
   const [isRunning, setIsRunning] = useState(false);
@@ -131,6 +137,11 @@ export default function Timer() {
               // show Settings to restart when all rounds are over
               if (roundCounter === pomSession.round * 2) {
                 setShowSettings(true);
+                // on rerun use todo Info again
+                todoAsPomo.todoID = pomSession.pomo.todoid
+                  ? pomSession.pomo.todoid
+                  : -1;
+                todoAsPomo.todoTask = pomSession.pomo.task;
               } else {
                 // usual pause/play button
                 if (isRunning) {
@@ -159,7 +170,7 @@ export default function Timer() {
       </div>
       {showSettings ? (
         <Modal onClose={closeShowSettings}>
-          <SettingsForm saveSettings={handleSettings} />
+          <SettingsForm saveSettings={handleSettings} todoAsPomo={todoAsPomo} />
         </Modal>
       ) : null}
     </>

@@ -2,6 +2,7 @@ import { Todo } from "./TodoList";
 import { ReactComponent as Checkmark } from "../../assets/checkmark.svg";
 import { ReactComponent as DeleteBtn } from "../../assets/delete.svg";
 import { ReactComponent as EditBtn } from "../../assets/edit.svg";
+import { ReactComponent as TimerBtn } from "../../assets/timer.svg";
 import { useState, useRef } from "react";
 import { SERVER } from "../../globals";
 import Modal from "../Modal";
@@ -9,9 +10,10 @@ import Modal from "../Modal";
 interface Props {
   item: Todo;
   updateList: () => void;
+  handleGoToPomo: (itemTitle: string, itemID: number) => void;
 }
 
-export default function TodoItem({ item, updateList }: Props) {
+export default function TodoItem({ item, updateList, handleGoToPomo }: Props) {
   const [expand, setExpand] = useState<boolean>(false);
   const [itemU, setItemU] = useState(item);
   const [editMode, setEditMode] = useState(false);
@@ -114,11 +116,17 @@ export default function TodoItem({ item, updateList }: Props) {
                 <p className={`text-white`}>{itemU.content}</p>
               </pre>
 
-              <div className="text-sm border-t border-white mt-2 text-right pt-1">
-                Due:
-                <span className={dueColor}>
-                  {" " + new Date(itemU.due).toLocaleDateString()}
-                </span>
+              <div className="text-sm border-t border-white mt-2 pt-1 flex justify-between">
+                <div>
+                  Due:
+                  <span className={dueColor}>
+                    {" " + new Date(itemU.due).toLocaleDateString()}
+                  </span>
+                </div>
+                <TimerBtn
+                  className="w-5 h-5 fill-white hover:fill-emerald-600 cursor-pointer"
+                  onClick={() => handleGoToPomo(itemU.title, itemU.id)}
+                />
               </div>
             </>
           ) : null}
