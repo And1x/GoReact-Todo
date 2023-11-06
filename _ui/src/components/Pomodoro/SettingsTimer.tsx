@@ -132,9 +132,6 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
             </button>
           );
         })}
-        <div onClick={() => setFormSettings(PreConfSessions.Default)}>
-          Resest
-        </div>
       </div>
       <div>
         <label className="block text-sm font-normal w-24" htmlFor="task_input">

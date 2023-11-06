@@ -175,9 +175,25 @@ func (app *app) newTodoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(todoJSON)
 }
 
-// func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
 
-// }
+	// note: this enables CORS for DEVMODE
+	enableCors(&w)
+
+	pomos, err := app.pomos.GetAll()
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	pomoJSON, err := json.Marshal(pomos)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(pomoJSON)
+}
 
 func (app *app) newPomoHandler(w http.ResponseWriter, r *http.Request) {
 

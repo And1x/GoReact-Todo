@@ -24,3 +24,13 @@ export const handleSaveNewPomo = async (pomo: Pomodoro) => {
     console.log(err);
   }
 };
+
+export const getAllPomos = async () => {
+  try {
+    const response = await fetch(`${SERVER}/pomos/all`);
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+};

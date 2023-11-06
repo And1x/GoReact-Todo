@@ -63,7 +63,7 @@ func (app *app) routes() http.Handler {
 	mux.Post("/new", app.newTodoHandler)
 
 	mux.Route("/pomos", func(mux chi.Router) {
-		// mux.Get("/", app.getPomosHandler)
+		mux.Get("/all", app.getPomosHandler)
 		mux.Post("/", app.newPomoHandler)
 	})
 

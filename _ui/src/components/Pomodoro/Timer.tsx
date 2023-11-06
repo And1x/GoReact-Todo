@@ -8,6 +8,7 @@ import { ReactComponent as SettingsIcon } from "../../assets/settings.svg";
 import { ReactComponent as PauseIcon } from "../../assets/pause.svg";
 import { ReactComponent as PlayIcon } from "../../assets/play_arrow.svg";
 import { ReactComponent as ReplayIcon } from "../../assets/replay.svg";
+import { ReactComponent as ListIcon } from "../../assets/list.svg";
 import Modal from "../Modal";
 import SettingsForm, {
   PomodoroSession,
@@ -16,15 +17,17 @@ import SettingsForm, {
 } from "./SettingsTimer";
 import { SECONDS, MINUTES, HOURS, displayTime } from "./TimeHelpers";
 import { handleSaveNewPomo } from "./httpRequests";
+import ShowStats from "./ShowStats";
 
 interface Props {
   todoAsPomo: TodoAsPomo;
 }
 
 export default function Timer({ todoAsPomo }: Props) {
-  // export default function Timer() {
   const [pomSession, setPomSession] = useState(PreConfSessions.Default);
   const [showSettings, setShowSettings] = useState(true);
+  const [showStats, setShowStats] = useState(false);
+
   const [roundCounter, setRoundCounter] = useState(0);
   const [time, setTime] = useState(pomSession.pomo.duration);
   const [isRunning, setIsRunning] = useState(false);
@@ -120,15 +123,18 @@ export default function Timer({ todoAsPomo }: Props) {
               ) : null}
             </div>
           </CircularProgressbarWithChildren>
-
-          <button
-            className="absolute top-0 right-0"
-            onClick={() => {
-              setShowSettings(!showSettings);
-            }}
-          >
-            <SettingsIcon className="w-6 h-6 fill-white hover:fill-emerald-600" />
-          </button>
+          <div className="absolute top-0 right-0">
+            <button
+              onClick={() => {
+                setShowSettings(!showSettings);
+              }}
+            >
+              <SettingsIcon className="w-6 h-6 fill-white hover:fill-emerald-600" />
+            </button>
+            <button onClick={() => setShowStats(true)}>
+              <ListIcon className="w-6 h-6 fill-white hover:fill-emerald-600"></ListIcon>
+            </button>
+          </div>
         </div>
         <div className="flex gap-5 pt-4">
           <button
@@ -171,6 +177,11 @@ export default function Timer({ todoAsPomo }: Props) {
       {showSettings ? (
         <Modal onClose={closeShowSettings}>
           <SettingsForm saveSettings={handleSettings} todoAsPomo={todoAsPomo} />
+        </Modal>
+      ) : null}
+      {showStats ? (
+        <Modal onClose={() => setShowStats(false)}>
+          <ShowStats></ShowStats>
         </Modal>
       ) : null}
     </>
