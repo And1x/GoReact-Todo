@@ -31,7 +31,7 @@ type app struct {
 		New(todo models.Todo) (*models.Todo, error)
 	}
 	pomos interface {
-		GetAll() ([]*models.Pomo, error)
+		Get(filter []string) ([]*models.Pomo, error)
 		New(pomo *models.Pomo) error
 	}
 }
@@ -63,8 +63,13 @@ func (app *app) routes() http.Handler {
 	mux.Post("/new", app.newTodoHandler)
 
 	mux.Route("/pomos", func(mux chi.Router) {
-		mux.Get("/all", app.getPomosHandler)
 		mux.Post("/", app.newPomoHandler)
+		mux.Get("/", app.getPomosHandler) // uses filter queries like eg. '.../pomos?from=today'
+		// daily:  ?from='today'
+		// month:  ?from='month
+		// year:   ?from='2023'
+		// all:    ?from='all'
+		// custom: ?from='YYYY-MM-DD'&to='YYYY-MM-DD' /about DATES see: ISO 8601
 	})
 
 	return mux

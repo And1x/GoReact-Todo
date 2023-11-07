@@ -2,6 +2,8 @@ package pomo
 
 import (
 	"database/sql"
+	"fmt"
+	"time"
 
 	"github.com/And1x/GoReact-Todo/models"
 )
@@ -10,8 +12,30 @@ type PomoModel struct {
 	DB *sql.DB
 }
 
-func (pm *PomoModel) GetAll() ([]*models.Pomo, error) {
-	stmt := `SELECT * FROM pomo;`
+// todo: use custom type as filter not []string
+func (pm *PomoModel) Get(filter []string) ([]*models.Pomo, error) {
+	var stmt string
+	switch filter[0] {
+	case "today":
+		day := time.Now().Day()
+		month := time.Now().Month()
+		year := time.Now().Year()
+		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE strftime('%%d - %%m - %%Y', DATE(started / 1000, 'unixepoch')) = '%02d - %02d - %d';`, day, month, year)
+	case "month":
+		month := time.Now().Month()
+		year := time.Now().Year()
+		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE strftime('%%m - %%Y', DATE(started / 1000, 'unixepoch')) = '%02d - %d';`, month, year)
+	case "year":
+		year := time.Now().Year()
+		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE strftime('%%Y', DATE(started / 1000, 'unixepoch')) = '%d';`, year)
+	case "custom":
+		// filter[0] = custom -- filter[1] = from_date -- filter[2] = to_date
+		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE DATE(started / 1000, 'unixepoch') >= '%v' AND DATE(started / 1000, 'unixepoch') <= '%v';`, filter[1], filter[2])
+
+	default: // 'all' doesnt need a own case so its handled here
+		stmt = `SELECT * FROM pomo;`
+	}
+
 	rows, err := pm.DB.Query(stmt)
 	if err != nil {
 		return nil, err

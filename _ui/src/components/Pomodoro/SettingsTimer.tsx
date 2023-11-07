@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MINUTES } from "./TimeHelpers";
 
 export class Pomodoro {
+  id: number | undefined; // sqlite generates ids
   task: string;
   duration: number;
   started: number | undefined;

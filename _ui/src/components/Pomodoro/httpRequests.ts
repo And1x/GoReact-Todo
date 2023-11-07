@@ -25,9 +25,15 @@ export const handleSaveNewPomo = async (pomo: Pomodoro) => {
   }
 };
 
-export const getAllPomos = async () => {
+export const getPomos = async (filter: string[]) => {
+  console.log(filter);
+  let query = "";
+  filter.length > 1
+    ? (query = `from=${filter[0]}&to=${filter[1]}`)
+    : (query = `from=${filter[0]}`);
+  console.log(query);
   try {
-    const response = await fetch(`${SERVER}/pomos/all`);
+    const response = await fetch(`${SERVER}/pomos?${query}`);
     const data = await response.json();
     return data;
   } catch (err) {

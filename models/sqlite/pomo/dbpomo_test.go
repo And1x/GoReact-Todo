@@ -22,7 +22,8 @@ func TestGetAll(t *testing.T) {
 
 		m := PomoModel{db}
 
-		pomos, err := m.GetAll()
+		f := []string{"all"}
+		pomos, err := m.Get(f)
 		if err != nil {
 			t.Errorf("failed calling GetAll()\n err: %v", err)
 		}

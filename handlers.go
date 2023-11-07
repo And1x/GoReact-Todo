@@ -179,8 +179,16 @@ func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
+	var filter = []string{}
+	if len(r.URL.Query().Get("from")) > 4 && len(r.URL.Query().Get("to")) > 4 {
+		filter = []string{"custom", r.URL.Query().Get("from"), r.URL.Query().Get("to")}
+	} else if len(r.URL.Query().Get("from")) > 1 && len(r.URL.Query().Get("to")) < 1 {
+		filter = []string{r.URL.Query().Get("from")}
+	} else {
+		filter = append(filter, "all")
+	}
 
-	pomos, err := app.pomos.GetAll()
+	pomos, err := app.pomos.Get(filter)
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return

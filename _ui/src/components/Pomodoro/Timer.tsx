@@ -181,7 +181,7 @@ export default function Timer({ todoAsPomo }: Props) {
       ) : null}
       {showStats ? (
         <Modal onClose={() => setShowStats(false)}>
-          <ShowStats></ShowStats>
+          <ShowStats />
         </Modal>
       ) : null}
     </>
