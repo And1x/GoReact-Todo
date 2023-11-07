@@ -37,6 +37,8 @@ export default function ShowStats() {
     if (filter === "custom") {
       setShowCustomDate(true);
       return;
+    } else {
+      setShowCustomDate(false);
     }
     getPomos([filter]).then((pomos) => {
       if (pomos) {
