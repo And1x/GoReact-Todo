@@ -10,7 +10,7 @@ type CustomDate = {
 
 export default function ShowStats() {
   const [pomoList, setPomoList] = useState<Pomodoro[]>([]);
-  const [showDate, setShowDate] = useState(false);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [showCustomDate, setShowCustomDate] = useState(false);
   const [customDate, setCustomDate] = useState<CustomDate>({
     from: "",
@@ -23,7 +23,7 @@ export default function ShowStats() {
       return "-";
     }
     const d = new Date(timestamp);
-    return showDate ? d.toLocaleString() : d.toLocaleTimeString();
+    return showMoreInfo ? d.toLocaleString() : d.toLocaleTimeString();
   }
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export default function ShowStats() {
 
   function handleSelect(filter: string) {
     if (filter === "custom") {
+      setPomoList([]);
       setShowCustomDate(true);
       return;
     } else {
@@ -60,12 +61,12 @@ export default function ShowStats() {
     // see modal p and navbar to get actual height
     <div className="min-h-[calc(100vh-2.5em-48px)] w-[573px]">
       <div>
-        <label htmlFor="showDate">Date</label>
+        <label htmlFor="showMoreInfo">More Info</label>
         <input
           type="checkbox"
           name="Date"
-          id="showDate"
-          onClick={() => setShowDate(!showDate)}
+          id="showMoreInfo"
+          onClick={() => setShowMoreInfo(!showMoreInfo)}
           className="ml-2"
         />
       </div>
@@ -79,6 +80,7 @@ export default function ShowStats() {
           <option value="today">Today</option>
           <option value="month">Month</option>
           <option value="year">Year</option>
+          <option value="all">All</option>
           <option value="custom">Custom</option>
         </select>
 
@@ -131,7 +133,7 @@ export default function ShowStats() {
           <th className="px-2">Duration</th>
           <th className="px-2">Started</th>
           <th className="px-2">Finished</th>
-          <th className="px-2">TodoID</th>
+          {showMoreInfo ? <th className="px-2">TodoID</th> : null}
         </tr>
         {pomoList.map((p) => {
           totalDuration += p.duration;
@@ -142,7 +144,9 @@ export default function ShowStats() {
               <td className="px-2">{p.duration / MINUTES}</td>
               <td className="px-2">{dateSwitch(p.started)}</td>
               <td className="px-2">{dateSwitch(p.finished)}</td>
-              <td className="px-2">{p.todoid}</td>
+              {showMoreInfo ? (
+                <td className="px-2">{p.todoid ? p.todoid : "-"}</td>
+              ) : null}
             </tr>
           );
         })}

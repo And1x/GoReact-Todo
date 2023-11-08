@@ -129,10 +129,10 @@ export default function Timer({ todoAsPomo }: Props) {
                 setShowSettings(!showSettings);
               }}
             >
-              <SettingsIcon className="w-6 h-6 fill-white hover:fill-emerald-600" />
+              <SettingsIcon className="w-7 h-7 fill-white hover:fill-emerald-600" />
             </button>
             <button onClick={() => setShowStats(true)}>
-              <ListIcon className="w-6 h-6 fill-white hover:fill-emerald-600"></ListIcon>
+              <ListIcon className="w-7 h-7 fill-white hover:fill-emerald-600"></ListIcon>
             </button>
           </div>
         </div>

@@ -23,6 +23,7 @@ type Pomo struct {
 }
 
 func CreateTodoTable(db *sql.DB) error {
+
 	stmt := `
 	CREATE TABLE IF NOT EXISTS todo(
 		id INTEGER NOT NULL PRIMARY KEY, 

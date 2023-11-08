@@ -11,8 +11,10 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/And1x/GoReact-Todo/models"
+	"golang.org/x/exp/slices"
 )
 
 // note: THIS IS FOR DEVMODE ONLY
@@ -179,13 +181,28 @@ func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// note: this enables CORS for DEVMODE
 	enableCors(&w)
+
 	var filter = []string{}
-	if len(r.URL.Query().Get("from")) > 4 && len(r.URL.Query().Get("to")) > 4 {
-		filter = []string{"custom", r.URL.Query().Get("from"), r.URL.Query().Get("to")}
-	} else if len(r.URL.Query().Get("from")) > 1 && len(r.URL.Query().Get("to")) < 1 {
-		filter = []string{r.URL.Query().Get("from")}
+	qUrlParamFrom := r.URL.Query().Get("from")
+	qUrlParamTo := r.URL.Query().Get("to")
+	if len(qUrlParamFrom) > 1 && len(qUrlParamTo) > 1 {
+		validDateFrom, err := time.Parse("2006-01-02", qUrlParamFrom)
+		if err != nil {
+			http.Error(w, "invalid query date format", http.StatusInternalServerError)
+			return
+		}
+		validDateTo, err := time.Parse("2006-01-02", qUrlParamTo)
+		if err != nil {
+			http.Error(w, "invalid query date format", http.StatusInternalServerError)
+			return
+		}
+		filter = []string{"custom", validDateFrom.String(), validDateTo.String()}
+		// } else if len(r.URL.Query().Get("from")) > 1 && len(r.URL.Query().Get("to")) < 1 {
+	} else if slices.Contains([]string{"today", "month", "year", "all"}, qUrlParamFrom) {
+		filter = []string{qUrlParamFrom}
 	} else {
-		filter = append(filter, "all")
+		http.Error(w, "invalid url query format", http.StatusInternalServerError)
+		return
 	}
 
 	pomos, err := app.pomos.Get(filter)

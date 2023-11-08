@@ -12,7 +12,6 @@ type PomoModel struct {
 	DB *sql.DB
 }
 
-// todo: use custom type as filter not []string
 func (pm *PomoModel) Get(filter []string) ([]*models.Pomo, error) {
 	var stmt string
 	switch filter[0] {
@@ -28,12 +27,13 @@ func (pm *PomoModel) Get(filter []string) ([]*models.Pomo, error) {
 	case "year":
 		year := time.Now().Year()
 		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE strftime('%%Y', DATE(started / 1000, 'unixepoch')) = '%d';`, year)
+	case "all":
+		stmt = `SELECT * FROM pomo;`
 	case "custom":
 		// filter[0] = custom -- filter[1] = from_date -- filter[2] = to_date
 		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE DATE(started / 1000, 'unixepoch') >= '%v' AND DATE(started / 1000, 'unixepoch') <= '%v';`, filter[1], filter[2])
-
-	default: // 'all' doesnt need a own case so its handled here
-		stmt = `SELECT * FROM pomo;`
+	default:
+		return nil, fmt.Errorf("query filter not supported")
 	}
 
 	rows, err := pm.DB.Query(stmt)

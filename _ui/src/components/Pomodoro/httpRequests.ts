@@ -32,6 +32,12 @@ export const getPomos = async (filter: string[]) => {
     : (query = `from=${filter[0]}`);
   try {
     const response = await fetch(`${SERVER}/pomos?${query}`);
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      throw new Error(
+        `Error! status: ${response.status} Custom Err Msg: ${errorMsg}`
+      );
+    }
     const data = await response.json();
     return data;
   } catch (err) {
