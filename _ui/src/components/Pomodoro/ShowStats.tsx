@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Pomodoro } from "./SettingsTimer";
-import { MINUTES } from "./TimeHelpers";
 import { getPomos } from "./httpRequests";
 
 type CustomDate = {
@@ -130,7 +129,7 @@ export default function ShowStats() {
         <tr className="text-lg border-b">
           <th className="px-2">No.</th>
           <th className="px-2">Task</th>
-          <th className="px-2">Duration</th>
+          <th className="px-2">Run</th>
           <th className="px-2">Started</th>
           <th className="px-2">Finished</th>
           {showMoreInfo ? <th className="px-2">TodoID</th> : null}
@@ -140,8 +139,14 @@ export default function ShowStats() {
           return (
             <tr className="even:bg-slate-900">
               <td className="px-2">{p.id}</td>
-              <td className="px-2">{p.task}</td>
-              <td className="px-2">{p.duration / MINUTES}</td>
+              <td
+                className={`px-2 w-72 [overflow-wrap:anywhere] ${
+                  showMoreInfo ? "" : "line-clamp-3"
+                }`}
+              >
+                {p.task}
+              </td>
+              <td className="px-2">{p.duration}</td>
               <td className="px-2">{dateSwitch(p.started)}</td>
               <td className="px-2">{dateSwitch(p.finished)}</td>
               {showMoreInfo ? (
@@ -153,7 +158,12 @@ export default function ShowStats() {
         <tr className="border-t-2 text-emerald-500">
           <td>{pomoList.length}</td>
           <td></td>
-          <td>{totalDuration / MINUTES}</td>
+          <td>
+            {Math.floor(totalDuration / 60) +
+              "h " +
+              (totalDuration % 60) +
+              "min"}
+          </td>
           <td></td>
           <td></td>
           <td></td>

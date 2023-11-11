@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { MINUTES } from "./TimeHelpers";
 
 export class Pomodoro {
   id: number | undefined; // sqlite generates ids
   task: string;
-  duration: number;
-  started: number | undefined;
-  finished: number | undefined;
+  duration: number; // in MINUTES
+  started: number | undefined; // in MINUTES
+  finished: number | undefined; // in MINUTES
   todoid: number | undefined;
 
   constructor(
@@ -17,7 +16,7 @@ export class Pomodoro {
     todoid?: number
   ) {
     (this.task = task),
-      (this.duration = duration * MINUTES),
+      (this.duration = duration),
       (this.started = started),
       (this.finished = finished),
       (this.todoid = todoid);
@@ -38,8 +37,8 @@ export class PomodoroSession {
   ) {
     (this.pomo = pomo),
       (this.round = round),
-      (this.shortBreak = shortBreak * MINUTES),
-      (this.longBreak = longBreak * MINUTES);
+      (this.shortBreak = shortBreak),
+      (this.longBreak = longBreak);
   }
 
   getTime(currentRound: number) {
@@ -147,13 +146,10 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
           onChange={(e) =>
             setFormSettings(
               new PomodoroSession(
-                new Pomodoro(
-                  e.target.value,
-                  formSettings.pomo.duration / MINUTES
-                ),
+                new Pomodoro(e.target.value, formSettings.pomo.duration),
                 formSettings.round,
-                formSettings.shortBreak / MINUTES,
-                formSettings.longBreak / MINUTES
+                formSettings.shortBreak,
+                formSettings.longBreak
               )
             )
           }
@@ -174,14 +170,14 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
             step={5}
             min={0}
             id="duration_input"
-            value={formSettings.pomo.duration / MINUTES}
+            value={formSettings.pomo.duration}
             onChange={(e) =>
               setFormSettings(
                 new PomodoroSession(
                   new Pomodoro(formSettings.pomo.task, e.target.valueAsNumber),
                   formSettings.round,
-                  formSettings.shortBreak / MINUTES,
-                  formSettings.longBreak / MINUTES
+                  formSettings.shortBreak,
+                  formSettings.longBreak
                 )
               )
             }
@@ -206,11 +202,11 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
                 new PomodoroSession(
                   new Pomodoro(
                     formSettings.pomo.task,
-                    formSettings.pomo.duration / MINUTES
+                    formSettings.pomo.duration
                   ),
                   e.target.valueAsNumber,
-                  formSettings.shortBreak / MINUTES,
-                  formSettings.longBreak / MINUTES
+                  formSettings.shortBreak,
+                  formSettings.longBreak
                 )
               )
             }
@@ -231,17 +227,17 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
             step={5}
             min={0}
             id="shortBreak_input"
-            value={formSettings.shortBreak / MINUTES}
+            value={formSettings.shortBreak}
             onChange={(e) =>
               setFormSettings(
                 new PomodoroSession(
                   new Pomodoro(
                     formSettings.pomo.task,
-                    formSettings.pomo.duration / MINUTES
+                    formSettings.pomo.duration
                   ),
                   formSettings.round,
                   e.target.valueAsNumber,
-                  formSettings.longBreak / MINUTES
+                  formSettings.longBreak
                 )
               )
             }
@@ -260,16 +256,16 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
             step={5}
             min={0}
             id="longBreak_input"
-            value={formSettings.longBreak / MINUTES}
+            value={formSettings.longBreak}
             onChange={(e) =>
               setFormSettings(
                 new PomodoroSession(
                   new Pomodoro(
                     formSettings.pomo.task,
-                    formSettings.pomo.duration / MINUTES
+                    formSettings.pomo.duration
                   ),
                   formSettings.round,
-                  formSettings.shortBreak / MINUTES,
+                  formSettings.shortBreak,
                   e.target.valueAsNumber
                 )
               )

@@ -33,7 +33,7 @@ func (pm *PomoModel) Get(filter []string) ([]*models.Pomo, error) {
 		// filter[0] = custom -- filter[1] = from_date -- filter[2] = to_date
 		stmt = fmt.Sprintf(`SELECT * FROM pomo WHERE DATE(started / 1000, 'unixepoch') >= '%v' AND DATE(started / 1000, 'unixepoch') <= '%v';`, filter[1], filter[2])
 	default:
-		return nil, fmt.Errorf("query filter not supported")
+		return nil, fmt.Errorf("invalid url query format")
 	}
 
 	rows, err := pm.DB.Query(stmt)

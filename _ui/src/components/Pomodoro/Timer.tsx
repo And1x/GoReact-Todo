@@ -29,7 +29,7 @@ export default function Timer({ todoAsPomo }: Props) {
   const [showStats, setShowStats] = useState(false);
 
   const [roundCounter, setRoundCounter] = useState(0);
-  const [time, setTime] = useState(pomSession.pomo.duration);
+  const [time, setTime] = useState(pomSession.pomo.duration * MINUTES);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number>();
 
@@ -40,7 +40,7 @@ export default function Timer({ todoAsPomo }: Props) {
   const handleSettings = (p: PomodoroSession) => {
     setPomSession(p);
     setRoundCounter(0);
-    setTime(p.pomo.duration);
+    setTime(p.pomo.duration * MINUTES);
     setShowSettings(false);
   };
 
@@ -89,7 +89,7 @@ export default function Timer({ todoAsPomo }: Props) {
         <div className="w-80 h-80 relative">
           <CircularProgressbarWithChildren
             strokeWidth={9}
-            value={(100 / pomSession.getTime(roundCounter)) * time} // in percent
+            value={((100 / pomSession.getTime(roundCounter)) * time) / MINUTES} // in percent
             styles={buildStyles({
               rotation: 1,
               strokeLinecap: "butt",

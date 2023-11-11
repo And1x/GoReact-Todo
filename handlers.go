@@ -197,7 +197,6 @@ func (app *app) getPomosHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		filter = []string{"custom", validDateFrom.String(), validDateTo.String()}
-		// } else if len(r.URL.Query().Get("from")) > 1 && len(r.URL.Query().Get("to")) < 1 {
 	} else if slices.Contains([]string{"today", "month", "year", "all"}, qUrlParamFrom) {
 		filter = []string{qUrlParamFrom}
 	} else {
@@ -235,6 +234,5 @@ func (app *app) newPomoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("stored: ", pomo)
 	w.WriteHeader(http.StatusAccepted)
 }

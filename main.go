@@ -79,7 +79,7 @@ func main() {
 
 	port := os.Getenv("VITE_SERVER_PORT")
 
-	db, err := openDB("database.db")
+	db, err := openDB("gotodopomodoro.sqlite")
 	if err != nil {
 		log.Fatal(err)
 	}

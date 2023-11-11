@@ -112,10 +112,9 @@ export default function TodoItem({ item, updateList, handleGoToPomo }: Props) {
           </h4>
           {expand ? (
             <>
-              <pre>
-                <p className={`text-white`}>{itemU.content}</p>
+              <pre className="whitespace-pre-wrap break-words">
+                {itemU.content}
               </pre>
-
               <div className="text-sm border-t border-white mt-2 pt-1 flex justify-between">
                 <div>
                   Due:

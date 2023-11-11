@@ -13,7 +13,7 @@ export default function Modal({ onClose, children }: Probs) {
       onClick={onClose}
     >
       <div
-        className="m-auto relative border rounded-lg border-violet-600 shadow-violet-600 shadow-md bg-black font-medium px-6 pt-12 pb-8 w-fit h-fit"
+        className="m-auto relative border rounded-lg border-violet-600 shadow-violet-600 shadow-md bg-black font-medium px-6 pt-12 pb-8  h-fit w-fit"
         onClick={(e) => e.stopPropagation()}
       >
         <button
