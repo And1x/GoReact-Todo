@@ -100,7 +100,7 @@ func main() {
 
 func openDB(dbName string) (*sql.DB, error) {
 	dsn := "?_foreign_keys=true"
-	db, err := sql.Open("sqlite3", "./data/"+dbName+dsn)
+	db, err := sql.Open("sqlite3", dbName+dsn)
 	if err != nil {
 		return nil, err
 	}

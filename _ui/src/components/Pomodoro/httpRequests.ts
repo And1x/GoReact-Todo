@@ -8,7 +8,7 @@ export const handleSaveNewPomo = async (pomo: Pomodoro) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         task: pomo.task,
-        duration: pomo.duration * 60,
+        duration: pomo.duration,
         started: pomo.started,
         finished: pomo.finished,
         todoid: pomo.todoid,
