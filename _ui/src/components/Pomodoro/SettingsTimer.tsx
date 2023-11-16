@@ -9,7 +9,7 @@ export class Pomodoro {
   todoid: number | undefined;
 
   constructor(
-    task = "Have fun:)",
+    task = "Just to test TIMER - wont get saved in DB -> Server reject", // intended reject bc. duration needs to be in MINUTES (INTEGER)
     duration = 0.05,
     started?: number,
     finished?: number,
