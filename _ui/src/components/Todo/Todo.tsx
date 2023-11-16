@@ -3,6 +3,7 @@ import { ReactComponent as Checkmark } from "../../assets/checkmark.svg";
 import { ReactComponent as DeleteBtn } from "../../assets/delete.svg";
 import { ReactComponent as EditBtn } from "../../assets/edit.svg";
 import { ReactComponent as TimerBtn } from "../../assets/timer.svg";
+import CustomMarkDown from "./CustomMarkDown";
 import { useState, useRef } from "react";
 import { SERVER } from "../../globals";
 import Modal from "../Modal";
@@ -112,9 +113,7 @@ export default function TodoItem({ item, updateList, handleGoToPomo }: Props) {
           </h4>
           {expand ? (
             <>
-              <pre className="whitespace-pre-wrap break-words">
-                {itemU.content}
-              </pre>
+              <CustomMarkDown content={itemU.content} />
               <div className="text-sm border-t border-white mt-2 pt-1 flex justify-between">
                 <div>
                   Due:

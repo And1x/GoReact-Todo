@@ -8,10 +8,7 @@ type Probs = {
 
 export default function Modal({ onClose, children }: Probs) {
   return (
-    <div
-      className="flex fixed inset-0 z-50 backdrop-blur-sm overflow-auto w-full h-full"
-      onClick={onClose}
-    >
+    <div className="flex fixed inset-0 z-50 backdrop-blur-sm overflow-auto w-full h-full">
       <div
         className="m-auto relative border rounded-lg border-violet-600 shadow-violet-600 shadow-md bg-black font-medium px-6 pt-12 pb-8  h-fit w-fit"
         onClick={(e) => e.stopPropagation()}
