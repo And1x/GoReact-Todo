@@ -150,13 +150,6 @@ export default function Timer({ todoAsPomo }: Props) {
           </div>
         </div>
         <div className="flex gap-5 pt-4">
-          {/* 
-          // 
-          // 
-          // Pause
-          // 
-          // 
-          //  */}
           <button
             className="w-12 h-12 font-bold text-lg rounded px-1 py-1 outline outline-1 outline-violet-600 hover:outline-2"
             onClick={() => {

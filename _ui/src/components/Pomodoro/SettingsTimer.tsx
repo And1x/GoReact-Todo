@@ -276,6 +276,7 @@ export default function SettingsForm({ saveSettings, todoAsPomo }: Props) {
       <button
         className="bg-emerald-800 rounded px-2 hover:bg-emerald-600 self-end"
         onClick={() => {
+          PreConfSessions.Default = formSettings;
           saveSettings(formSettings);
         }}
         type="submit"
