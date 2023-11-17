@@ -27,11 +27,12 @@ export default function Timer({ todoAsPomo }: Props) {
   const [pomSession, setPomSession] = useState(PreConfSessions.Default);
   const [showSettings, setShowSettings] = useState(true);
   const [showStats, setShowStats] = useState(false);
-
   const [roundCounter, setRoundCounter] = useState(0);
-  const [time, setTime] = useState(pomSession.pomo.duration * MINUTES);
+  const [time, setTime] = useState(pomSession.pomo.duration * MINUTES); // in ms
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number>();
+  const tempDurationRef = useRef(pomSession.pomo.duration);
+  const tempStartedRef = useRef<number>(0);
 
   const closeShowSettings = () => {
     setShowSettings(false);
@@ -50,7 +51,7 @@ export default function Timer({ todoAsPomo }: Props) {
     }
 
     setIsRunning(false);
-    setTime(pomSession.getTime(roundCounter + 1));
+    setTime(pomSession.getTime(roundCounter + 1) * MINUTES);
     clearInterval(intervalRef.current);
   };
 
@@ -60,12 +61,12 @@ export default function Timer({ todoAsPomo }: Props) {
 
   useEffect(() => {
     if (isRunning) {
-      console.log("T1: Start: ", Date.now());
-      pomSession.pomo.started = Date.now();
+      pomSession.pomo.started ? null : (pomSession.pomo.started = Date.now());
+      tempStartedRef.current = Date.now();
+
       intervalRef.current = setInterval(() => {
         setTime((curTime) => {
-          if (curTime <= 0) {
-            console.log("T1: End: ", Date.now());
+          if (curTime < 250) {
             pomSession.pomo.finished = Date.now();
             if (roundCounter < pomSession.round * 2) {
               setRoundCounter(roundCounter + 1);
@@ -73,12 +74,15 @@ export default function Timer({ todoAsPomo }: Props) {
             setIsRunning(false);
             clearInterval(intervalRef.current);
             !isBreak(roundCounter) ? handleSaveNewPomo(pomSession.pomo) : null;
-            return pomSession.getTime(roundCounter + 1);
+            return pomSession.getTime(roundCounter + 1) * MINUTES;
           } else {
-            return curTime - 1 * SECONDS;
+            return (
+              tempDurationRef.current * MINUTES -
+              (Date.now() - tempStartedRef.current)
+            );
           }
         });
-      }, SECONDS);
+      }, 200); // 200ms seems fine; eg. 1000ms is to imprecise and will cause visual jumps of Seconds
     }
     return () => clearInterval(intervalRef.current);
   }, [isRunning, roundCounter, pomSession]);
@@ -89,7 +93,10 @@ export default function Timer({ todoAsPomo }: Props) {
         <div className="w-80 h-80 relative">
           <CircularProgressbarWithChildren
             strokeWidth={9}
-            value={((100 / pomSession.getTime(roundCounter)) * time) / MINUTES} // in percent
+            value={
+              (100 / (pomSession.getTime(roundCounter) * 60)) *
+              Math.floor(time / 1000)
+            } // in percent
             styles={buildStyles({
               rotation: 1,
               strokeLinecap: "butt",
@@ -99,12 +106,18 @@ export default function Timer({ todoAsPomo }: Props) {
             })}
           >
             <div className="relative">
-              <div className="flex gap-2 font-medium text-5xl">
-                {displayTime(Math.floor(time / HOURS))}
+              <div className="flex font-medium text-5xl">
+                <div className="w-[4rem] text-center">
+                  {displayTime(Math.floor(time / HOURS))}
+                </div>
                 <span>:</span>
-                {displayTime(Math.floor((time / MINUTES) % 60))}
+                <div className="w-[4rem] text-center">
+                  {displayTime(Math.floor((time / MINUTES) % 60))}
+                </div>
                 <span>:</span>
-                {displayTime(Math.floor((time / SECONDS) % 60))}
+                <div className="w-[4rem] text-center">
+                  {displayTime(Math.floor((time / SECONDS) % 60))}
+                </div>
               </div>
               <div
                 className="absolute left-[50%] -translate-x-1/2"
@@ -137,6 +150,13 @@ export default function Timer({ todoAsPomo }: Props) {
           </div>
         </div>
         <div className="flex gap-5 pt-4">
+          {/* 
+          // 
+          // 
+          // Pause
+          // 
+          // 
+          //  */}
           <button
             className="w-12 h-12 font-bold text-lg rounded px-1 py-1 outline outline-1 outline-violet-600 hover:outline-2"
             onClick={() => {
@@ -154,6 +174,7 @@ export default function Timer({ todoAsPomo }: Props) {
                   clearInterval(intervalRef.current);
                 }
                 setIsRunning(!isRunning);
+                tempDurationRef.current = time / MINUTES;
               }
             }}
           >
@@ -167,7 +188,7 @@ export default function Timer({ todoAsPomo }: Props) {
             className="w-12 h-12 font-bold text-lg rounded px-2 py-1 outline outline-1 outline-violet-600 hover:outline-2"
             onClick={() => {
               setIsRunning(false);
-              setTime(pomSession.getTime(roundCounter));
+              setTime(pomSession.getTime(roundCounter) * MINUTES);
             }}
           >
             <ReplayIcon className="w-8 h-8 fill-white" />
